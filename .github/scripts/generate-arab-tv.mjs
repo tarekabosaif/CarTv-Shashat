@@ -312,13 +312,16 @@ for (const channel of channels) {
     continue;
   }
 
-  if (
-    !channel.categories?.some(category =>
-      categories.has(category)
-    )
-  ) {
-    continue;
-  }
+  const isEgypt = channel.country === "EG";
+
+const isWantedCategory =
+  channel.categories?.some(category =>
+    categories.has(category)
+  );
+
+if (!isEgypt && !isWantedCategory) {
+  continue;
+}
 
   const category =
     getPlaylistCategory(channel);

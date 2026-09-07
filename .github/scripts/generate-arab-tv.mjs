@@ -48,7 +48,8 @@ const categories = new Set([
   "series",
   "sports",
   "kids",
-  "movies"
+  "movies",
+  "religious"
 ]);
 
 /*
@@ -154,7 +155,26 @@ function getPlaylistCategory(channel) {
   const channelCategories = channel.categories || [];
   const name = (channel.name || "").toLowerCase();
 
-  // 1) Series always wins over Movies
+  // Quran channels - Egypt & Saudi Arabia only
+  const quranKeywords = [
+    "quran",
+    "qur'an",
+    "koran",
+    "قرآن",
+    "القرآن",
+    "quran kareem",
+    "holy quran"
+  ];
+
+  if (
+    channelCategories.includes("religious") &&
+    ["EG", "SA"].includes(channel.country) &&
+    quranKeywords.some(keyword => name.includes(keyword))
+  ) {
+    return "Quran";
+  }
+
+  // Series
   if (
     channelCategories.includes("series") ||
     name.includes("drama")
@@ -162,20 +182,19 @@ function getPlaylistCategory(channel) {
     return "Series";
   }
 
-  // 2) Sports
+  // Sports
   if (channelCategories.includes("sports")) {
     return "Sports";
   }
 
-  // 3) Kids
+  // Kids
   if (channelCategories.includes("kids")) {
     return "Kids";
   }
 
-  // 4) Movies
+  // Movies
   if (channelCategories.includes("movies")) {
 
-    // Known foreign-movie indicators
     const foreignKeywords = [
       "hollywood",
       "bollywood",
@@ -193,7 +212,6 @@ function getPlaylistCategory(channel) {
       return "Foreign Movies";
     }
 
-    // Known Arabic cinema brands / indicators
     const arabicKeywords = [
       "rotana cinema",
       "aflam",
@@ -206,7 +224,6 @@ function getPlaylistCategory(channel) {
       return "Arabic Movies";
     }
 
-    // Fall back to feed language
     const channelStreams =
       streamsByChannel.get(channel.id) || [];
 

@@ -1,36 +1,49 @@
 import fs from "node:fs/promises";
 
 const API = "https://iptv-org.github.io/api";
+const FREE_TV_URL =
+  "https://raw.githubusercontent.com/Free-TV/IPTV/master/playlist.m3u8";
 
 const [
   channels,
   streams,
   feeds,
   regions,
-  logos
+  logos,
+  freeTvText
 ] = await Promise.all([
   fetchJson(`${API}/channels.json`),
   fetchJson(`${API}/streams.json`),
   fetchJson(`${API}/feeds.json`),
   fetchJson(`${API}/regions.json`),
-  fetchJson(`${API}/logos.json`)
+  fetchJson(`${API}/logos.json`),
+  fetchText(FREE_TV_URL)
 ]);
 
-function fetchJson(url) {
-  return fetch(url).then(async response => {
-    if (!response.ok) {
-      throw new Error(`Failed to fetch ${url}: ${response.status}`);
-    }
+async function fetchJson(url) {
+  const response = await fetch(url);
 
-    return response.json();
-  });
+  if (!response.ok) {
+    throw new Error(`Failed to fetch ${url}: ${response.status}`);
+  }
+
+  return response.json();
 }
 
-/*
- * Arab World
- *
- * IPTV-org maintains the Arab World region in regions.json.
- */
+async function fetchText(url) {
+  const response = await fetch(url);
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch ${url}: ${response.status}`);
+  }
+
+  return response.text();
+}
+
+/* =========================================================
+ * Arab World countries
+ * ========================================================= */
+
 const arabRegion = regions.find(
   region => region.code?.toUpperCase() === "ARAB"
 );
@@ -41,9 +54,10 @@ if (!arabRegion) {
 
 const arabCountries = new Set(arabRegion.countries);
 
-/*
- * Categories we want.
- */
+/* =========================================================
+ * Categories
+ * ========================================================= */
+
 const categories = new Set([
   "series",
   "sports",
@@ -52,18 +66,16 @@ const categories = new Set([
   "religious"
 ]);
 
-/*
- * Arabic language codes.
- */
 const arabicLanguages = new Set([
   "ara",
   "arb",
   "ar"
 ]);
 
-/*
- * Build lookup maps.
- */
+/* =========================================================
+ * Lookup maps
+ * ========================================================= */
+
 const feedMap = new Map(
   feeds.map(feed => [
     `${feed.channel}@${feed.id}`,
@@ -81,29 +93,6 @@ for (const logo of logos) {
   }
 }
 
-/*
- * Only channels:
- * - from Arab World countries
- * - non-NSFW
- * - in our selected categories
- */
-const selectedChannels = channels.filter(channel => {
-  if (!arabCountries.has(channel.country)) {
-    return false;
-  }
-
-  if (channel.is_nsfw) {
-    return false;
-  }
-
-  return channel.categories?.some(category =>
-    categories.has(category)
-  );
-});
-
-/*
- * Map streams to channels.
- */
 const streamsByChannel = new Map();
 
 for (const stream of streams) {
@@ -116,9 +105,10 @@ for (const stream of streams) {
   streamsByChannel.get(stream.channel).push(stream);
 }
 
-/*
- * Country names.
- */
+/* =========================================================
+ * Country names
+ * ========================================================= */
+
 const countryNames = {
   DZ: "Algeria",
   BH: "Bahrain",
@@ -148,22 +138,22 @@ function countryName(code) {
   return countryNames[code] || code;
 }
 
-/*
- * Determine the playlist category.
- */
+/* =========================================================
+ * Playlist category
+ * ========================================================= */
+
 function getPlaylistCategory(channel) {
   const channelCategories = channel.categories || [];
   const name = (channel.name || "").toLowerCase();
 
-  // Quran channels - Egypt & Saudi Arabia only
   const quranKeywords = [
     "quran",
     "qur'an",
     "koran",
     "قرآن",
     "القرآن",
-    "quran kareem",
-    "holy quran"
+    "holy quran",
+    "quran kareem"
   ];
 
   if (
@@ -174,7 +164,6 @@ function getPlaylistCategory(channel) {
     return "Quran";
   }
 
-  // Series
   if (
     channelCategories.includes("series") ||
     name.includes("drama")
@@ -182,17 +171,14 @@ function getPlaylistCategory(channel) {
     return "Series";
   }
 
-  // Sports
   if (channelCategories.includes("sports")) {
     return "Sports";
   }
 
-  // Kids
   if (channelCategories.includes("kids")) {
     return "Kids";
   }
 
-  // Movies
   if (channelCategories.includes("movies")) {
 
     const foreignKeywords = [
@@ -202,9 +188,6 @@ function getPlaylistCategory(channel) {
       "thriller",
       "english",
       "hindi",
-      "cinema one",
-      "movies action",
-      "movies thriller",
       "osn movies"
     ];
 
@@ -236,7 +219,11 @@ function getPlaylistCategory(channel) {
 
       const languages = feed.languages || [];
 
-      if (languages.some(lang => arabicLanguages.has(lang))) {
+      if (
+        languages.some(lang =>
+          arabicLanguages.has(lang)
+        )
+      ) {
         return "Arabic Movies";
       }
     }
@@ -247,125 +234,402 @@ function getPlaylistCategory(channel) {
   return null;
 }
 
-/*
- * Stream scoring.
- *
- * This is NOT a guarantee of Car TV compatibility.
- * It simply avoids obviously problematic streams where possible.
- */
+/* =========================================================
+ * Stream scoring
+ * ========================================================= */
+
 function scoreStream(stream) {
   let score = 0;
 
-  const title = `${stream.title || ""} ${stream.label || ""}`.toLowerCase();
+  const text =
+    `${stream.title || ""} ${stream.label || ""}`.toLowerCase();
 
-  if (stream.label) {
-    score -= 100;
+  if (text.includes("offline")) {
+    score -= 1000;
   }
 
-  if (title.includes("geo-blocked")) {
-    score -= 100;
+  if (text.includes("geo-blocked")) {
+    score -= 50;
   }
 
-  if (title.includes("offline")) {
-    score -= 100;
+  if (stream.url?.includes(".m3u8")) {
+    score += 40;
+  }
+
+  if (!stream.referrer) {
+    score += 15;
+  }
+
+  if (!stream.user_agent) {
+    score += 10;
   }
 
   if (stream.quality) {
-    const match = stream.quality.match(/(\d{3,4})p/i);
+    const match =
+      stream.quality.match(/(\d{3,4})p/i);
 
     if (match) {
       const quality = Number(match[1]);
 
-      /*
-       * Prefer 720p/1080p.
-       * Avoid excessively high streams for Car TV.
-       */
-      if (quality === 720) score += 30;
-      else if (quality === 1080) score += 25;
-      else if (quality === 576) score += 20;
-      else if (quality === 480) score += 15;
+      if (quality === 720) score += 40;
+      else if (quality === 1080) score += 35;
+      else if (quality === 576) score += 25;
+      else if (quality === 480) score += 20;
       else if (quality > 1080) score -= 10;
     }
-  }
-
-  /*
-   * HLS is generally the most common format for IPTV.
-   */
-  if (stream.url.includes(".m3u8")) {
-    score += 20;
-  }
-
-  /*
-   * Prefer streams without special request requirements.
-   */
-  if (!stream.referrer) {
-    score += 10;
-  }
-
-  if (!stream.user_agent) {
-    score += 5;
   }
 
   return score;
 }
 
 function selectBestStream(channel) {
-  const available = streamsByChannel.get(channel.id) || [];
+  const available =
+    streamsByChannel.get(channel.id) || [];
 
   if (!available.length) {
     return null;
   }
 
-  return [...available]
-    .sort((a, b) => scoreStream(b) - scoreStream(a))[0];
+  return [...available].sort(
+    (a, b) =>
+      scoreStream(b) - scoreStream(a)
+  )[0];
 }
 
-/*
- * Deduplicate by channel.
- */
+/* =========================================================
+ * IPTV-org selection
+ * ========================================================= */
+
 const selected = [];
 
-for (const channel of selectedChannels) {
-  const category = getPlaylistCategory(channel);
+for (const channel of channels) {
+
+  if (!arabCountries.has(channel.country)) {
+    continue;
+  }
+
+  if (channel.is_nsfw) {
+    continue;
+  }
+
+  if (
+    !channel.categories?.some(category =>
+      categories.has(category)
+    )
+  ) {
+    continue;
+  }
+
+  const category =
+    getPlaylistCategory(channel);
 
   if (!category) continue;
 
-  const stream = selectBestStream(channel);
+  const stream =
+    selectBestStream(channel);
 
   if (!stream) continue;
 
   selected.push({
     channel,
     stream,
-    category
+    category,
+    source: "IPTV-org"
   });
 }
 
+/* =========================================================
+ * Parse Free-TV M3U
+ * ========================================================= */
+
+function parseM3U(text) {
+  const lines =
+    text.split(/\r?\n/);
+
+  const result = [];
+
+  for (let i = 0; i < lines.length; i++) {
+
+    const line = lines[i].trim();
+
+    if (!line.startsWith("#EXTINF")) {
+      continue;
+    }
+
+    let url = "";
+
+    for (
+      let j = i + 1;
+      j < lines.length;
+      j++
+    ) {
+      const next = lines[j].trim();
+
+      if (!next) continue;
+
+      if (!next.startsWith("#")) {
+        url = next;
+        break;
+      }
+    }
+
+    if (!url) continue;
+
+    const name =
+      line.includes(",")
+        ? line.substring(
+            line.lastIndexOf(",") + 1
+          ).trim()
+        : "Unknown";
+
+    const groupMatch =
+      line.match(/group-title="([^"]+)"/i);
+
+    const idMatch =
+      line.match(/tvg-id="([^"]*)"/i);
+
+    const logoMatch =
+      line.match(/tvg-logo="([^"]*)"/i);
+
+    result.push({
+      name,
+      url,
+      group:
+        groupMatch?.[1] || "",
+      tvgId:
+        idMatch?.[1] || "",
+      logo:
+        logoMatch?.[1] || ""
+    });
+  }
+
+  return result;
+}
+
+const freeTvChannels =
+  parseM3U(freeTvText);
+
+/* =========================================================
+ * Egypt enrichment
+ * ========================================================= */
+
 /*
- * Sort:
- *
- * Country
- *   Category
- *     Channel
+ * These are useful Egyptian channels that may not be
+ * classified by IPTV-org under our selected categories.
  */
+
+const egyptWanted = [
+  "mbc masr",
+  "mbc masr 1",
+  "mbc masr 2",
+  "alhayat",
+  "al hayat",
+  "al qahera news",
+  "cairo news",
+  "cbc",
+  "cbc drama",
+  "dmc",
+  "dmc drama",
+  "on",
+  "on drama",
+  "al nahar",
+  "al nahar drama",
+  "sada el balad",
+  "sada el balad drama",
+  "rotana cinema",
+  "mix hollywood",
+  "koogi",
+  "al masriyah",
+  "watan tv"
+];
+
+function normalizeName(name) {
+  return String(name || "")
+    .toLowerCase()
+    .replace(/[^\p{L}\p{N}]+/gu, " ")
+    .trim();
+}
+
+function isWantedEgyptChannel(name) {
+
+  const normalized =
+    normalizeName(name);
+
+  return egyptWanted.some(
+    wanted =>
+      normalized.includes(
+        normalizeName(wanted)
+      )
+  );
+}
+
+function classifyEgyptChannel(name) {
+
+  const n =
+    normalizeName(name);
+
+  if (
+    n.includes("koogi") ||
+    n.includes("kids")
+  ) {
+    return "Kids";
+  }
+
+  if (
+    n.includes("drama") ||
+    n.includes("مسلسلات")
+  ) {
+    return "Series";
+  }
+
+  if (
+    n.includes("hollywood") ||
+    n.includes("action") ||
+    n.includes("thriller") ||
+    n.includes("bollywood")
+  ) {
+    return "Foreign Movies";
+  }
+
+  if (
+    n.includes("rotana cinema") ||
+    n.includes("cinema") ||
+    n.includes("aflam")
+  ) {
+    return "Arabic Movies";
+  }
+
+  /*
+   * General Egyptian channels that don't fit one
+   * of our old categories.
+   */
+  return "Egypt TV";
+}
+
+/* =========================================================
+ * Dedupe helpers
+ * ========================================================= */
+
+function channelKey(name) {
+  return normalizeName(name)
+    .replace(/\bhd\b/g, "")
+    .replace(/\bsd\b/g, "")
+    .trim();
+}
+
+const existingNames =
+  new Set(
+    selected.map(item =>
+      channelKey(
+        item.channel.name
+      )
+    )
+  );
+
+/* =========================================================
+ * Add Egypt channels from Free-TV
+ * ========================================================= */
+
+for (const item of freeTvChannels) {
+
+  const group =
+    normalizeName(item.group);
+
+  /*
+   * Free-TV uses country groups.
+   */
+  const isEgypt =
+    group === "egypt" ||
+    group.includes("egypt");
+
+  if (!isEgypt) {
+    continue;
+  }
+
+  if (
+    !isWantedEgyptChannel(item.name)
+  ) {
+    continue;
+  }
+
+  const key =
+    channelKey(item.name);
+
+  if (existingNames.has(key)) {
+    continue;
+  }
+
+  existingNames.add(key);
+
+  selected.push({
+    channel: {
+      id:
+        item.tvgId ||
+        `FreeTV.${key.replace(/\s+/g, "")}.eg`,
+      name: item.name,
+      country: "EG"
+    },
+
+    stream: {
+      url: item.url
+    },
+
+    category:
+      classifyEgyptChannel(
+        item.name
+      ),
+
+    logo: item.logo,
+
+    source: "Free-TV"
+  });
+}
+
+/* =========================================================
+ * Sorting
+ * ========================================================= */
+
+const categoryOrder = {
+  Quran: 1,
+  Kids: 2,
+  Series: 3,
+  "Arabic Movies": 4,
+  "Foreign Movies": 5,
+  Sports: 6,
+  "Egypt TV": 7
+};
+
 selected.sort((a, b) => {
-  const countryA = countryName(a.channel.country);
-  const countryB = countryName(b.channel.country);
+
+  const countryA =
+    countryName(a.channel.country);
+
+  const countryB =
+    countryName(b.channel.country);
 
   if (countryA !== countryB) {
     return countryA.localeCompare(countryB);
   }
 
-  if (a.category !== b.category) {
-    return a.category.localeCompare(b.category);
+  const orderA =
+    categoryOrder[a.category] ?? 99;
+
+  const orderB =
+    categoryOrder[b.category] ?? 99;
+
+  if (orderA !== orderB) {
+    return orderA - orderB;
   }
 
-  return a.channel.name.localeCompare(b.channel.name);
+  return a.channel.name.localeCompare(
+    b.channel.name
+  );
 });
 
-/*
- * Generate M3U.
- */
+/* =========================================================
+ * Generate M3U
+ * ========================================================= */
+
 const output = [];
 
 output.push(
@@ -373,7 +637,7 @@ output.push(
 );
 
 output.push(
-  '# Generated automatically from IPTV-org API'
+  "# Generated automatically from IPTV-org + Free-TV"
 );
 
 output.push(
@@ -385,35 +649,51 @@ output.push("");
 let currentGroup = null;
 
 for (const item of selected) {
+
   const {
     channel,
     stream,
     category
   } = item;
 
-  const country = countryName(channel.country);
+  const country =
+    countryName(channel.country);
 
-  const group = `${country} | ${category}`;
+  const group =
+    `${country} | ${category}`;
 
   if (group !== currentGroup) {
+
     currentGroup = group;
 
-    output.push(`# === ${group} ===`);
+    output.push(
+      `# === ${group} ===`
+    );
   }
 
-  const logo = logoMap.get(channel.id) || "";
+  const logo =
+    item.logo ||
+    logoMap.get(channel.id) ||
+    "";
 
-  const groupEscaped = group.replace(/"/g, "'");
+  const name =
+    channel.name
+      .replace(/\r?\n/g, " ")
+      .trim();
 
-  const name = channel.name
-    .replace(/\r?\n/g, " ")
-    .trim();
+  const safeName =
+    name.replace(/"/g, "'");
+
+  const safeGroup =
+    group.replace(/"/g, "'");
 
   const attributes = [
-    `tvg-id="${channel.id}"`,
-    `tvg-name="${name.replace(/"/g, "'")}"`,
-    logo ? `tvg-logo="${logo}"` : "",
-    `group-title="${groupEscaped}"`
+    `tvg-id="${channel.id || ""}"`,
+    `tvg-name="${safeName}"`,
+    logo
+      ? `tvg-logo="${logo}"`
+      : "",
+    `group-title="${safeGroup}"`
   ]
     .filter(Boolean)
     .join(" ");
@@ -422,21 +702,33 @@ for (const item of selected) {
     `#EXTINF:-1 ${attributes},${name}`
   );
 
-  output.push(stream.url);
+  output.push(
+    stream.url
+  );
 
   output.push("");
 }
 
-/*
- * Write output.
- */
-await fs.mkdir("playlists", { recursive: true });
+/* =========================================================
+ * Write file
+ * ========================================================= */
+
+await fs.mkdir(
+  "playlists",
+  {
+    recursive: true
+  }
+);
 
 await fs.writeFile(
   "playlists/arab-tv.m3u",
   output.join("\n"),
   "utf8"
 );
+
+/* =========================================================
+ * Summary
+ * ========================================================= */
 
 console.log(
   `Generated ${selected.length} channels.`
@@ -445,10 +737,14 @@ console.log(
 const summary = {};
 
 for (const item of selected) {
-  const key =
-    `${countryName(item.channel.country)} | ${item.category}`;
 
-  summary[key] = (summary[key] || 0) + 1;
+  const key =
+    `${countryName(
+      item.channel.country
+    )} | ${item.category}`;
+
+  summary[key] =
+    (summary[key] || 0) + 1;
 }
 
 console.table(summary);

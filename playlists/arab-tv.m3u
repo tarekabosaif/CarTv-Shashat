@@ -1,6 +1,6 @@
 #EXTM3U x-tvg-url="https://raw.githubusercontent.com/StrangeDrVN/epg/public/output/guide.xml.gz"
 # Generated automatically from IPTV-org API
-# Generated: 2026-09-07T12:18:52.661Z
+# Generated: 2026-09-07T12:23:35.539Z
 
 # === Algeria | Kids ===
 #EXTINF:-1 tvg-id="AmouYazidTV.dz" tvg-name="Amou Yazid TV" tvg-logo="https://i.imgur.com/L8UPGPC.png" group-title="Algeria | Kids",Amou Yazid TV
@@ -106,6 +106,16 @@ https://shd-amg-fast.edgenextcdn.net/tx012/playlist.m3u8
 # === Saudi Arabia | Kids ===
 #EXTINF:-1 tvg-id="AtfalMawahebTV.sa" tvg-name="Atfal & Mawaheb TV" tvg-logo="https://i.imgur.com/Y2BqP9m.png" group-title="Saudi Arabia | Kids",Atfal & Mawaheb TV
 https://5aafcc5de91f1.streamlock.net/atfal1.com/atfal2/playlist.m3u8
+
+# === Saudi Arabia | Quran ===
+#EXTINF:-1 tvg-id="AlQuranAlKareemTV.sa" tvg-name="Al Quran Al Kareem TV" tvg-logo="https://aloula.faulio.com/storage/mediagallery/da/6c/fullhd_7eaf7e165c4cad5b3a45eff65d2011e18be5d670.png" group-title="Saudi Arabia | Quran",Al Quran Al Kareem TV
+http://m.live.net.sa:1935/live/quran/gmswf.m3u8
+
+#EXTINF:-1 tvg-id="HolyQuranRadio.sa" tvg-name="Holy Quran Radio" tvg-logo="https://aloula.faulio.com/storage/mediagallery/14/da/fullhd_823bc2fe722ede75410492d57fd6c201208b4224.png" group-title="Saudi Arabia | Quran",Holy Quran Radio
+https://live.kwikmotion.com/sbrksaquranradiolive/srpksaquranradio/playlist.m3u8
+
+#EXTINF:-1 tvg-id="IqraaQuran.sa" tvg-name="Iqraa Quran" tvg-logo="https://i.imgur.com/HPVsIa4.png" group-title="Saudi Arabia | Quran",Iqraa Quran
+https://playlist.fasttvcdn.com/pl/dlkqw1ftuvuuzkcb4pxdcg/Iqraafasttv2/playlist.m3u8
 
 # === Saudi Arabia | Series ===
 #EXTINF:-1 tvg-id="BabAlHara.sa" tvg-name="Bab Al Hara" tvg-logo="https://i.imgur.com/QtlnZbq.png" group-title="Saudi Arabia | Series",Bab Al Hara

@@ -323,10 +323,16 @@ if (!isEgypt && !isWantedCategory) {
   continue;
 }
 
-  const category =
-    getPlaylistCategory(channel);
+  let category =
+  getPlaylistCategory(channel);
 
-  if (!category) continue;
+// Don't discard Egyptian channels just because
+// IPTV-org classified them as general/news/etc.
+if (!category && channel.country === "EG") {
+  category = "Egypt TV";
+}
+
+if (!category) continue;
 
   const stream =
     selectBestStream(channel);

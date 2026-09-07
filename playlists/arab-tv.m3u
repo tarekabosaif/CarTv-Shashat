@@ -1,6 +1,6 @@
 #EXTM3U x-tvg-url="https://raw.githubusercontent.com/StrangeDrVN/epg/public/output/guide.xml.gz"
 # Generated automatically from IPTV-org API
-# Generated: 2026-09-07T12:14:29.397Z
+# Generated: 2026-09-07T12:18:52.661Z
 
 # === Algeria | Kids ===
 #EXTINF:-1 tvg-id="AmouYazidTV.dz" tvg-name="Amou Yazid TV" tvg-logo="https://i.imgur.com/L8UPGPC.png" group-title="Algeria | Kids",Amou Yazid TV
@@ -18,11 +18,12 @@ https://5c7b683162943.streamlock.net/live/ngrp:sportsone_all/playlist.m3u8
 https://5c7b683162943.streamlock.net/live/ngrp:bahrainsportstwo_all/playlist.m3u8
 
 # === Egypt | Arabic Movies ===
-#EXTINF:-1 tvg-id="MixHollywood.eg" tvg-name="Mix Hollywood" tvg-logo="https://i.imgur.com/1ENdbZn.png" group-title="Egypt | Arabic Movies",Mix Hollywood
-https://ml-pull-hwc.myco.io/MixTV/hls/index.m3u8
-
 #EXTINF:-1 tvg-id="RotanaCinemaEgypt.eg" tvg-name="Rotana Cinema Egypt" tvg-logo="https://i.imgur.com/dGlKoLW.png" group-title="Egypt | Arabic Movies",Rotana Cinema Egypt
 https://rotana.hibridcdn.net/rotananet/cinemamasr_net-7Y83PP5adWixDF93/playlist.m3u8
+
+# === Egypt | Foreign Movies ===
+#EXTINF:-1 tvg-id="MixHollywood.eg" tvg-name="Mix Hollywood" tvg-logo="https://i.imgur.com/1ENdbZn.png" group-title="Egypt | Foreign Movies",Mix Hollywood
+https://ml-pull-hwc.myco.io/MixTV/hls/index.m3u8
 
 # === Egypt | Kids ===
 #EXTINF:-1 tvg-id="KoogiTV.eg" tvg-name="Koogi TV" tvg-logo="https://i.imgur.com/zojMTP9.png" group-title="Egypt | Kids",Koogi TV
@@ -92,17 +93,15 @@ https://liveeu-gcp.alkassdigital.net/alkass2-p/main.m3u8
 #EXTINF:-1 tvg-id="Aflam.sa" tvg-name="Aflam" tvg-logo="https://i.imgur.com/cTLj7Yt.png" group-title="Saudi Arabia | Arabic Movies",Aflam
 https://shd-amg-fast.edgenextcdn.net/tx001/playlist.m3u8
 
-#EXTINF:-1 tvg-id="MBCPlusDrama.sa" tvg-name="MBC+ Drama" tvg-logo="https://i.imgur.com/lxWdjXG.png" group-title="Saudi Arabia | Arabic Movies",MBC+ Drama
-https://shd-gcp-live.edgenextcdn.net/live/bitmovin-mbc-plus-drama/e37251ec2aac8f6c98f75cd0fa37cd28/index.m3u8
-
-#EXTINF:-1 tvg-id="MoviesAction.sa" tvg-name="Movies Action" tvg-logo="https://i.imgur.com/NIVhISa.png" group-title="Saudi Arabia | Arabic Movies",Movies Action
-https://shd-amg-fast.edgenextcdn.net/tx011/playlist.m3u8
-
-#EXTINF:-1 tvg-id="MoviesThriller.sa" tvg-name="Movies Thriller" tvg-logo="https://i.imgur.com/JWihdcl.png" group-title="Saudi Arabia | Arabic Movies",Movies Thriller
-https://shd-amg-fast.edgenextcdn.net/tx012/playlist.m3u8
-
 #EXTINF:-1 tvg-id="RotanaCinemaKSA.sa" tvg-name="Rotana Cinema KSA" tvg-logo="https://i.imgur.com/pGgp38I.png" group-title="Saudi Arabia | Arabic Movies",Rotana Cinema KSA
 https://rotana.hibridcdn.net/rotananet/cinema_net-7Y83PP5adWixDF93/playlist.m3u8
+
+# === Saudi Arabia | Foreign Movies ===
+#EXTINF:-1 tvg-id="MoviesAction.sa" tvg-name="Movies Action" tvg-logo="https://i.imgur.com/NIVhISa.png" group-title="Saudi Arabia | Foreign Movies",Movies Action
+https://shd-amg-fast.edgenextcdn.net/tx011/playlist.m3u8
+
+#EXTINF:-1 tvg-id="MoviesThriller.sa" tvg-name="Movies Thriller" tvg-logo="https://i.imgur.com/JWihdcl.png" group-title="Saudi Arabia | Foreign Movies",Movies Thriller
+https://shd-amg-fast.edgenextcdn.net/tx012/playlist.m3u8
 
 # === Saudi Arabia | Kids ===
 #EXTINF:-1 tvg-id="AtfalMawahebTV.sa" tvg-name="Atfal & Mawaheb TV" tvg-logo="https://i.imgur.com/Y2BqP9m.png" group-title="Saudi Arabia | Kids",Atfal & Mawaheb TV
@@ -118,6 +117,9 @@ https://shd-amg-fast.edgenextcdn.net/tx008/playlist.m3u8
 #EXTINF:-1 tvg-id="MBCMasrDrama.sa" tvg-name="MBC Masr Drama" tvg-logo="https://media0070.elcinema.com/tvguide/1399_1.png" group-title="Saudi Arabia | Series",MBC Masr Drama
 https://shd-gcp-live.edgenextcdn.net/live/bitmovin-mbc-masr-drama/567b703c19ede6598222de81b0e4508b/index.m3u8
 
+#EXTINF:-1 tvg-id="MBCPlusDrama.sa" tvg-name="MBC+ Drama" tvg-logo="https://i.imgur.com/lxWdjXG.png" group-title="Saudi Arabia | Series",MBC+ Drama
+https://shd-gcp-live.edgenextcdn.net/live/bitmovin-mbc-plus-drama/e37251ec2aac8f6c98f75cd0fa37cd28/index.m3u8
+
 #EXTINF:-1 tvg-id="RotanaDrama.sa" tvg-name="Rotana Drama" tvg-logo="https://i.imgur.com/btnhPjZ.png" group-title="Saudi Arabia | Series",Rotana Drama
 https://rotana.hibridcdn.net/rotananet/drama_net-7Y83PP5adWixDF93/playlist.m3u8
 
@@ -125,11 +127,10 @@ https://rotana.hibridcdn.net/rotananet/drama_net-7Y83PP5adWixDF93/playlist.m3u8
 #EXTINF:-1 tvg-id="Prime.sy" tvg-name="Prime" tvg-logo="https://prime1tv.com/wp-content/uploads/2025/12/7-1.png" group-title="Syria | Sports",Prime
 https://mn-nl.mncdn.com/primetv/live/index.m3u8
 
-# === United Arab Emirates | Arabic Movies ===
-#EXTINF:-1 tvg-id="MBCBollywood.ae" tvg-name="MBC Bollywood" tvg-logo="https://i.imgur.com/TTAGFHG.png" group-title="United Arab Emirates | Arabic Movies",MBC Bollywood
+# === United Arab Emirates | Foreign Movies ===
+#EXTINF:-1 tvg-id="MBCBollywood.ae" tvg-name="MBC Bollywood" tvg-logo="https://i.imgur.com/TTAGFHG.png" group-title="United Arab Emirates | Foreign Movies",MBC Bollywood
 https://shd-gcp-live.edgenextcdn.net/live/bitmovin-mbc-bollywood/546eb40d7dcf9a209255dd2496903764/index.m3u8
 
-# === United Arab Emirates | Foreign Movies ===
 #EXTINF:-1 tvg-id="OSNMoviesAction.ae" tvg-name="OSN Movies Action" tvg-logo="https://i.imgur.com/uOzyKup.png" group-title="United Arab Emirates | Foreign Movies",OSN Movies Action
 http://116.90.120.151:8000/play/a0ax/index.m3u8
 

@@ -152,23 +152,61 @@ function countryName(code) {
  */
 function getPlaylistCategory(channel) {
   const channelCategories = channel.categories || [];
+  const name = (channel.name || "").toLowerCase();
 
+  // 1) Series always wins over Movies
+  if (
+    channelCategories.includes("series") ||
+    name.includes("drama")
+  ) {
+    return "Series";
+  }
+
+  // 2) Sports
   if (channelCategories.includes("sports")) {
     return "Sports";
   }
 
+  // 3) Kids
   if (channelCategories.includes("kids")) {
     return "Kids";
   }
 
-  if (channelCategories.includes("series")) {
-    return "Series";
-  }
-
+  // 4) Movies
   if (channelCategories.includes("movies")) {
-    /*
-     * For movies, determine language from the feed.
-     */
+
+    // Known foreign-movie indicators
+    const foreignKeywords = [
+      "hollywood",
+      "bollywood",
+      "action",
+      "thriller",
+      "english",
+      "hindi",
+      "cinema one",
+      "movies action",
+      "movies thriller",
+      "osn movies"
+    ];
+
+    if (foreignKeywords.some(keyword => name.includes(keyword))) {
+      return "Foreign Movies";
+    }
+
+    // Known Arabic cinema brands / indicators
+    const arabicKeywords = [
+      "rotana cinema",
+      "aflam",
+      "cinema masr",
+      "arabic",
+      "masr"
+    ];
+
+    if (arabicKeywords.some(keyword => name.includes(keyword))) {
+      return "Arabic Movies";
+    }
+
+    // Fall back to feed language
     const channelStreams =
       streamsByChannel.get(channel.id) || [];
 

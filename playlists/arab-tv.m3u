@@ -1,6 +1,7 @@
 #EXTM3U x-tvg-url="https://raw.githubusercontent.com/StrangeDrVN/epg/public/output/guide.xml.gz"
 # Generated automatically from IPTV-org + Free-TV
-# Generated: 2026-09-08T01:30:55.666Z
+# Filters: Arab countries + Arabic/English + No Adult + No Coptic
+# Generated: 2026-09-08T06:12:32.317Z
 
 # === Algeria | Kids ===
 #EXTINF:-1 tvg-id="AmouYazidTV.dz" tvg-name="Amou Yazid TV" tvg-logo="https://i.imgur.com/L8UPGPC.png" group-title="Algeria | Kids",Amou Yazid TV
@@ -26,9 +27,6 @@ https://5d658d7e9f562.streamlock.net/koogi.tv/koogi.smil/playlist.m3u8
 https://flu.systemnet.tv/CBCDrama/index.m3u8
 
 # === Egypt | Arabic Movies ===
-#EXTINF:-1 tvg-id="RotanaCinema.eg" tvg-name="Rotana Cinema" tvg-logo="https://upload.wikimedia.org/wikipedia/commons/9/92/Rotana_Cinema_Egy.png" group-title="Egypt | Arabic Movies",Rotana Cinema
-https://rotana.hibridcdn.net/rotananet/cinemamasr_net-7Y83PP5adWixDF93/playlist.m3u8
-
 #EXTINF:-1 tvg-id="RotanaCinemaEgypt.eg" tvg-name="Rotana Cinema Egypt" tvg-logo="https://i.imgur.com/dGlKoLW.png" group-title="Egypt | Arabic Movies",Rotana Cinema Egypt
 https://rotana.hibridcdn.net/rotananet/cinemamasr_net-7Y83PP5adWixDF93/playlist.m3u8
 
@@ -37,9 +35,6 @@ https://rotana.hibridcdn.net/rotananet/cinemamasr_net-7Y83PP5adWixDF93/playlist.
 https://ml-pull-hwc.myco.io/MixTV/hls/index.m3u8
 
 # === Egypt | Egypt TV ===
-#EXTINF:-1 tvg-id="AghapyTV.eg" tvg-name="Aghapy TV" tvg-logo="https://upload.wikimedia.org/wikipedia/en/e/eb/AghapyTV.jpg" group-title="Egypt | Egypt TV",Aghapy TV
-https://5b622f07944df.streamlock.net/aghapy.tv/aghapy.smil/playlist.m3u8
-
 #EXTINF:-1 tvg-id="AlGhadTV.eg" tvg-name="Al Ghad TV" tvg-logo="https://i.imgur.com/ga6NXb9.png" group-title="Egypt | Egypt TV",Al Ghad TV
 https://eazyvwqssi.erbvr.com/alghadtv/alghadtv.m3u8
 
@@ -58,9 +53,6 @@ https://flu.systemnet.tv/CBC/index.m3u8
 #EXTINF:-1 tvg-id="CBCSofra.eg" tvg-name="CBC Sofra" tvg-logo="https://i.imgur.com/YAdk2WR.png" group-title="Egypt | Egypt TV",CBC Sofra
 https://flu.systemnet.tv/CBCSofra/index.m3u8
 
-#EXTINF:-1 tvg-id="CopticTV.eg" tvg-name="Coptic TV" tvg-logo="https://www.ctvchannel.tv/images/CTV-logo-white.png" group-title="Egypt | Egypt TV",Coptic TV
-https://ctv.icopts.app/CTV/index.fmp4.m3u8
-
 #EXTINF:-1 tvg-id="ElRadio9090FM.eg" tvg-name="El Radio 9090 FM" tvg-logo="https://www.9090.fm/images/logo.png" group-title="Egypt | Egypt TV",El Radio 9090 FM
 https://9090video.mobtada.com/hls/stream.m3u8
 
@@ -76,9 +68,6 @@ https://shd-gcp-live.edgenextcdn.net/live/bitmovin-mbc-1-na/eec141533c90dd34722c
 #EXTINF:-1 tvg-id="MBCMasr.eg" tvg-name="MBC Masr" tvg-logo="https://i.imgur.com/o2elx0u.png" group-title="Egypt | Egypt TV",MBC Masr
 https://shd-gcp-live.edgenextcdn.net/live/bitmovin-mbc-masr/956eac069c78a35d47245db6cdbb1575/index.m3u8
 
-#EXTINF:-1 tvg-id="MBCMasr1.eg" tvg-name="MBC Masr 1" tvg-logo="https://upload.wikimedia.org/wikipedia/commons/7/7c/MBC_Masr_Logo.png" group-title="Egypt | Egypt TV",MBC Masr 1
-https://shd-gcp-live.edgenextcdn.net/live/bitmovin-mbc-masr/956eac069c78a35d47245db6cdbb1575/index.m3u8
-
 #EXTINF:-1 tvg-id="MBCMasr2.eg" tvg-name="MBC Masr 2" tvg-logo="https://i.imgur.com/KHo7Gtn.png" group-title="Egypt | Egypt TV",MBC Masr 2
 https://shd-gcp-live.edgenextcdn.net/live/bitmovin-mbc-masr-2/754931856515075b0aabf0e583495c68/index.m3u8
 
@@ -88,16 +77,13 @@ https://nogoumtv.nrpstream.com/hls/stream.m3u8
 #EXTINF:-1 tvg-id="WatanTV.eg" tvg-name="Watan TV" tvg-logo="https://i.imgur.com/pZyKaUH.png" group-title="Egypt | Egypt TV",Watan TV
 https://rp.tactivemedia.com/watantv_source/live/playlist.m3u8
 
-# === Iraq | Kids ===
-#EXTINF:-1 tvg-id="AfarinBaxcha.iq" tvg-name="Afarin Baxcha" tvg-logo="https://afarin.tv/images/baxcha.png" group-title="Iraq | Kids",Afarin Baxcha
-https://5dcabf026b188.streamlock.net/afarinTV/livestream/playlist.m3u8
-
-#EXTINF:-1 tvg-id="AfarinTV.iq" tvg-name="Afarin TV" tvg-logo="https://i.imgur.com/6MnXD7g.png" group-title="Iraq | Kids",Afarin TV
-https://65f16f0fdfc51.streamlock.net/afarinTV/livestream/playlist.m3u8
-
 # === Iraq | Sports ===
 #EXTINF:-1 tvg-id="AlIraqiaSport.iq" tvg-name="Al Iraqia Sport" tvg-logo="https://i.imgur.com/DrrlxTO.png" group-title="Iraq | Sports",Al Iraqia Sport
 https://imn-live.esite-lab.com/hls/iraqia-sports-1.m3u8
+
+# === Jordan | Comedy ===
+#EXTINF:-1 tvg-id="JordanComedy.jo" tvg-name="Jordan Comedy" tvg-logo="https://i.imgur.com/DuwwoO2.png" group-title="Jordan | Comedy",Jordan Comedy
+https://playlist.fasttvcdn.com/pl/cc0blorawy1ibohhrupraa/Comedy/playlist.m3u8
 
 # === Jordan | Sports ===
 #EXTINF:-1 tvg-id="JordanSport.jo" tvg-name="Jordan Sport" tvg-logo="https://i.imgur.com/2EmrZPQ.png" group-title="Jordan | Sports",Jordan Sport
@@ -158,6 +144,10 @@ https://playlist.fasttvcdn.com/pl/dlkqw1ftuvuuzkcb4pxdcg/Iqraafasttv2/playlist.m
 #EXTINF:-1 tvg-id="AtfalMawahebTV.sa" tvg-name="Atfal & Mawaheb TV" tvg-logo="https://i.imgur.com/Y2BqP9m.png" group-title="Saudi Arabia | Kids",Atfal & Mawaheb TV
 https://5aafcc5de91f1.streamlock.net/atfal1.com/atfal2/playlist.m3u8
 
+# === Saudi Arabia | Comedy ===
+#EXTINF:-1 tvg-id="RotanaComedy.sa" tvg-name="Rotana Comedy" tvg-logo="https://i.imgur.com/IlT8U6S.png" group-title="Saudi Arabia | Comedy",Rotana Comedy
+https://rotana.hibridcdn.net/rotananet/comedy_net-7Y83PP5adWixDF93/playlist.m3u8
+
 # === Saudi Arabia | Series ===
 #EXTINF:-1 tvg-id="BabAlHara.sa" tvg-name="Bab Al Hara" tvg-logo="https://i.imgur.com/QtlnZbq.png" group-title="Saudi Arabia | Series",Bab Al Hara
 https://shd-amg-fast.edgenextcdn.net/tx010/playlist.m3u8
@@ -188,6 +178,10 @@ https://shd-amg-fast.edgenextcdn.net/tx011/playlist.m3u8
 #EXTINF:-1 tvg-id="MoviesThriller.sa" tvg-name="Movies Thriller" tvg-logo="https://i.imgur.com/JWihdcl.png" group-title="Saudi Arabia | Foreign Movies",Movies Thriller
 https://shd-amg-fast.edgenextcdn.net/tx012/playlist.m3u8
 
+# === Syria | Family ===
+#EXTINF:-1 tvg-id="AlSouriyaTV.sy" tvg-name="Al-Souriya TV" tvg-logo="https://i.imgur.com/8FILgXT.jpeg" group-title="Syria | Family",Al-Souriya TV
+https://shd-gcp-live.edgenextcdn.net/live/bitmovin-al-souriya-tv/e3150760fa5fd62776225433b8c3d406/index.m3u8
+
 # === Syria | Sports ===
 #EXTINF:-1 tvg-id="Prime.sy" tvg-name="Prime" tvg-logo="https://prime1tv.com/wp-content/uploads/2025/12/7-1.png" group-title="Syria | Sports",Prime
 https://mn-nl.mncdn.com/primetv/live/index.m3u8
@@ -196,7 +190,14 @@ https://mn-nl.mncdn.com/primetv/live/index.m3u8
 #EXTINF:-1 tvg-id="SpacetoonArabic.ae" tvg-name="Spacetoon Arabic" tvg-logo="https://upload.wikimedia.org/wikipedia/en/2/2b/Spacetoon_logo.png" group-title="United Arab Emirates | Kids",Spacetoon Arabic
 https://live-uae-next.spacetoongo.com/ST_MENA_NEXT/hls/r9p2hjipmw2kl.m3u8
 
+# === United Arab Emirates | Family ===
+#EXTINF:-1 tvg-id="MBC5.ae" tvg-name="MBC 5" tvg-logo="https://i.imgur.com/fRWaDyF.png" group-title="United Arab Emirates | Family",MBC 5
+https://shd-gcp-live.edgenextcdn.net/live/bitmovin-mbc-5/ee6b000cee0629411b666ab26cb13e9b/index.m3u8
+
 # === United Arab Emirates | Series ===
+#EXTINF:-1 tvg-id="MBCDrama.ae" tvg-name="MBC Drama" tvg-logo="https://i.imgur.com/g5PWnqp.png" group-title="United Arab Emirates | Series",MBC Drama
+https://shd-gcp-live.edgenextcdn.net/live/bitmovin-mbc-drama/2c28a458e2f3253e678b07ac7d13fe71/index.m3u8
+
 #EXTINF:-1 tvg-id="ZeeAlwan.ae" tvg-name="Zee Alwan" tvg-logo="https://i.imgur.com/OLuCox7.png" group-title="United Arab Emirates | Series",Zee Alwan
 https://tgn.bozztv.com/gin-dvrfl05/ga-zeealwan/index.m3u8
 

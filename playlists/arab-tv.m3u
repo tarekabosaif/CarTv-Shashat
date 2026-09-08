@@ -1,9 +1,10 @@
 #EXTM3U x-tvg-url="https://raw.githubusercontent.com/StrangeDrVN/epg/public/output/guide.xml.gz"
-# Generated automatically from IPTV-org + Free-TV
+# Generated automatically from IPTV-org + Free-TV + validated Egypt fallback
 # Countries: BH, EG, JO, KW, PS, QA, SA, SY, TN, AE
 # Filters: Selected Arab countries + Arabic/English/Hindi + No Adult + No Coptic + Koogi Blocked
+# Egypt discovery: ON / OnTime Sports / Al Nahar / DMC / Sada El Balad
 # Playback: No codec-based channel filtering
-# Generated: 2026-09-08T07:57:27.170Z
+# Generated: 2026-09-08T08:12:47.972Z
 
 # === Bahrain | Sports ===
 #EXTINF:-1 tvg-id="BahrainSports1.bh" tvg-name="Bahrain Sports 1" tvg-logo="https://i.imgur.com/fBpLsbC.png" group-title="Bahrain | Sports",Bahrain Sports 1

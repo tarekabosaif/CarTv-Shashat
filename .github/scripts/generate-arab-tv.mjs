@@ -18,8 +18,7 @@ const [
   feeds,
   regions,
   logos,
-  freeTvText,
-  arabicExtraText
+  freeTvText
 ] = await Promise.all([
   fetchJson(`${API}/channels.json`),
   fetchJson(`${API}/streams.json`),
@@ -27,8 +26,87 @@ const [
   fetchJson(`${API}/regions.json`),
   fetchJson(`${API}/logos.json`),
   fetchText(FREE_TV_URL),
-  fetchText(ARABIC_EXTRA_URL)
+  async function fetchOptionalText(
+  url,
+  sourceName
+) {
+  try {
+    console.log(
+      `Loading optional source: ${sourceName}`
+    );
+
+    const response = await fetch(
+      url,
+      {
+        headers: {
+          "User-Agent":
+            "Mozilla/5.0 CarTv-Shashat/1.0",
+          "Accept":
+            "application/x-mpegURL, application/vnd.apple.mpegurl, text/plain, */*"
+        },
+
+        signal:
+          AbortSignal.timeout(20000)
+      }
+    );
+
+    if (!response.ok) {
+      console.warn(
+        `⚠️ Optional source ${sourceName} returned HTTP ${response.status}.`
+      );
+
+      console.warn(
+        "Playlist generation will continue without it."
+      );
+
+      return "";
+    }
+
+    const text =
+      await response.text();
+
+    if (
+      !text ||
+      !text.includes("#EXT")
+    ) {
+      console.warn(
+        `⚠️ Optional source ${sourceName} did not return a valid M3U playlist.`
+      );
+
+      return "";
+    }
+
+    console.log(
+      `✅ Optional source loaded: ${sourceName}`
+    );
+
+    return text;
+
+  } catch (error) {
+    console.warn(
+      `⚠️ Could not load optional source ${sourceName}: ${error.message}`
+    );
+
+    console.warn(
+      "Continuing with IPTV-org + Free-TV."
+    );
+
+    return "";
+  }
+}
 ]);
+
+/*
+ * Extra source is OPTIONAL.
+ *
+ * If it fails, the playlist should still be generated
+ * from IPTV-org + Free-TV.
+ */
+const arabicExtraText =
+  await fetchOptionalText(
+    ARABIC_EXTRA_URL,
+    "Arabic Extra"
+  );
 
 async function fetchJson(url) {
   const response = await fetch(url);

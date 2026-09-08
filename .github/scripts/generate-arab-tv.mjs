@@ -1418,8 +1418,6 @@ const egyptWanted = [
 
   "mix hollywood",
 
-  "koogi",
-
   "al masriyah",
 
   "watan tv",
@@ -1527,7 +1525,6 @@ function classifyEgyptChannel(
     includesKeyword(
       n,
       [
-        "koogi",
         "kids",
         "children",
         "أطفال"

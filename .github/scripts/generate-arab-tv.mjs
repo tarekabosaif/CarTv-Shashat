@@ -1,19 +1,22 @@
 import fs from "node:fs/promises";
 
-const API = "https://iptv-org.github.io/api";
+/* =========================================================
+ * Sources
+ * ========================================================= */
+
+const API =
+  "https://iptv-org.github.io/api";
 
 const FREE_TV_URL =
   "https://raw.githubusercontent.com/Free-TV/IPTV/master/playlist.m3u8";
-
-const ARABIC_EXTRA_URL =
-  "https://live.hacks.tools/iptv/languages/ara.m3u";
 
 /* =========================================================
  * Fetch helpers
  * ========================================================= */
 
 async function fetchJson(url) {
-  const response = await fetch(url);
+  const response =
+    await fetch(url);
 
   if (!response.ok) {
     throw new Error(
@@ -25,7 +28,8 @@ async function fetchJson(url) {
 }
 
 async function fetchText(url) {
-  const response = await fetch(url);
+  const response =
+    await fetch(url);
 
   if (!response.ok) {
     throw new Error(
@@ -36,83 +40,13 @@ async function fetchText(url) {
   return response.text();
 }
 
-/*
- * Optional sources must NEVER stop
- * playlist generation.
- */
-async function fetchOptionalText(
-  url,
-  sourceName
-) {
-  try {
-    console.log(
-      `Loading optional source: ${sourceName}`
-    );
-
-    const response = await fetch(
-      url,
-      {
-        headers: {
-          "User-Agent":
-            "Mozilla/5.0 CarTv-Shashat/1.0",
-
-          "Accept":
-            "application/x-mpegURL, application/vnd.apple.mpegurl, text/plain, */*"
-        },
-
-        signal:
-          AbortSignal.timeout(20000)
-      }
-    );
-
-    if (!response.ok) {
-      console.warn(
-        `⚠️ Optional source ${sourceName} returned HTTP ${response.status}.`
-      );
-
-      console.warn(
-        "Continuing without this optional source."
-      );
-
-      return "";
-    }
-
-    const text =
-      await response.text();
-
-    if (
-      !text ||
-      !text.includes("#EXT")
-    ) {
-      console.warn(
-        `⚠️ Optional source ${sourceName} returned invalid M3U content.`
-      );
-
-      return "";
-    }
-
-    console.log(
-      `✅ Optional source loaded: ${sourceName}`
-    );
-
-    return text;
-
-  } catch (error) {
-    console.warn(
-      `⚠️ Optional source ${sourceName} failed: ${error.message}`
-    );
-
-    console.warn(
-      "Continuing with IPTV-org + Free-TV."
-    );
-
-    return "";
-  }
-}
-
 /* =========================================================
- * Load required sources
+ * Load sources
  * ========================================================= */
+
+console.log(
+  "Loading IPTV-org + Free-TV..."
+);
 
 const [
   channels,
@@ -122,25 +56,34 @@ const [
   logos,
   freeTvText
 ] = await Promise.all([
-  fetchJson(`${API}/channels.json`),
-  fetchJson(`${API}/streams.json`),
-  fetchJson(`${API}/feeds.json`),
-  fetchJson(`${API}/regions.json`),
-  fetchJson(`${API}/logos.json`),
-  fetchText(FREE_TV_URL)
+  fetchJson(
+    `${API}/channels.json`
+  ),
+
+  fetchJson(
+    `${API}/streams.json`
+  ),
+
+  fetchJson(
+    `${API}/feeds.json`
+  ),
+
+  fetchJson(
+    `${API}/regions.json`
+  ),
+
+  fetchJson(
+    `${API}/logos.json`
+  ),
+
+  fetchText(
+    FREE_TV_URL
+  )
 ]);
 
-/* =========================================================
- * Load optional Theater source
- * ========================================================= */
-
-const arabicExtraText =
-  await fetchOptionalText(
-    ARABIC_EXTRA_URL,
-    "Arabic Extra"
-  );
-
-
+console.log(
+  "✅ Sources loaded."
+);
 
 /* =========================================================
  * Helpers
@@ -149,27 +92,79 @@ const arabicExtraText =
 function normalizeName(name) {
   return String(name || "")
     .toLowerCase()
-    .replace(/[^\p{L}\p{N}]+/gu, " ")
-    .replace(/\s+/g, " ")
+    .replace(
+      /[^\p{L}\p{N}]+/gu,
+      " "
+    )
+    .replace(
+      /\s+/g,
+      " "
+    )
     .trim();
 }
 
-function includesKeyword(text, keywords) {
-  const normalized = normalizeName(text);
+function includesKeyword(
+  text,
+  keywords
+) {
+  const normalized =
+    normalizeName(text);
 
-  return keywords.some(keyword =>
-    normalized.includes(normalizeName(keyword))
+  return keywords.some(
+    keyword =>
+      normalized.includes(
+        normalizeName(keyword)
+      )
   );
 }
 
 /* =========================================================
- * Arab countries ONLY
+ * Allowed countries
+ *
+ * This object is now the SINGLE source of truth.
+ *
+ * Add/remove a country here and the playlist filter
+ * automatically follows it.
  * ========================================================= */
 
-const arabRegion = regions.find(
-  region =>
-    region.code?.toUpperCase() === "ARAB"
-);
+const countryNames = {
+  BH: "Bahrain",
+  EG: "Egypt",
+  JO: "Jordan",
+  KW: "Kuwait",
+  PS: "Palestine",
+  QA: "Qatar",
+  SA: "Saudi Arabia",
+  SY: "Syria",
+  TN: "Tunisia",
+  AE: "United Arab Emirates"
+};
+
+const allowedArabCountries =
+  new Set(
+    Object.keys(
+      countryNames
+    )
+  );
+
+function countryName(code) {
+  return (
+    countryNames[code] ||
+    code
+  );
+}
+
+/* =========================================================
+ * Confirm ARAB region exists
+ * ========================================================= */
+
+const arabRegion =
+  regions.find(
+    region =>
+      region.code
+        ?.toUpperCase() ===
+      "ARAB"
+  );
 
 if (!arabRegion) {
   throw new Error(
@@ -177,92 +172,101 @@ if (!arabRegion) {
   );
 }
 
-const arabCountries =
-  new Set(arabRegion.countries);
-
-const allowedArabCountries = new Set([
-  "AE",
-  "BH",
-  "DJ",
-  "DZ",
-  "EG",
-  "IQ",
-  "JO",
-  "KM",
-  "KW",
-  "LB",
-  "LY",
-  "MA",
-  "MR",
-  "OM",
-  "PS",
-  "QA",
-  "SA",
-  "SD",
-  "SO",
-  "SY",
-  "TN",
-  "YE"
-]);
+const arabRegionCountries =
+  new Set(
+    arabRegion.countries || []
+  );
 
 /* =========================================================
- * Allowed languages
+ * Allowed primary languages
  *
- * Arabic + English allowed.
- * We DON'T strictly reject channels that also have
- * another language such as Hindi.
+ * Arabic and English are preferred.
+ *
+ * Hindi is NOT globally blocked because channels such as
+ * MBC Bollywood / Zee Alwan are intentionally allowed
+ * when they belong to our selected Arab countries.
  * ========================================================= */
 
-const allowedLanguages = new Set([
-  "ar",
-  "ara",
-  "arb",
-  "arabic",
+const allowedLanguages =
+  new Set([
+    "ar",
+    "ara",
+    "arb",
+    "arabic",
 
-  "en",
-  "eng",
-  "english"
-]);
+    "en",
+    "eng",
+    "english",
 
-function normalizeLanguage(language) {
-  return String(language || "")
+    /*
+     * Explicitly allowed
+     */
+    "hi",
+    "hin",
+    "hindi"
+  ]);
+
+function normalizeLanguage(
+  language
+) {
+  return String(
+    language || ""
+  )
     .trim()
     .toLowerCase();
 }
 
 /* =========================================================
- * Categories we want from IPTV-org
+ * Source categories
  * ========================================================= */
 
-const sourceCategories = new Set([
-  "series",
-  "sports",
-  "kids",
-  "movies",
-  "religious",
-  "comedy",
-  "family",
-  "entertainment",
-  "culture"
-]);
+const sourceCategories =
+  new Set([
+    "series",
+    "sports",
+    "kids",
+    "movies",
+    "religious",
+    "comedy",
+    "family",
+    "entertainment",
+    "culture"
+  ]);
 
 /* =========================================================
- * Lookup maps
+ * Feed lookup
  * ========================================================= */
 
-const feedMap = new Map(
-  feeds.map(feed => [
-    `${feed.channel}@${feed.id}`,
-    feed
-  ])
-);
+const feedMap =
+  new Map(
+    feeds.map(
+      feed => [
+        `${feed.channel}@${feed.id}`,
+        feed
+      ]
+    )
+  );
 
-const logoMap = new Map();
+/* =========================================================
+ * Logo lookup
+ * ========================================================= */
 
-for (const logo of logos) {
-  if (!logo.in_use) continue;
+const logoMap =
+  new Map();
 
-  if (!logoMap.has(logo.channel)) {
+for (
+  const logo
+  of logos
+) {
+  if (!logo.in_use) {
+    continue;
+  }
+
+  if (
+    !logoMap.has(
+      logo.channel
+    )
+  ) {
     logoMap.set(
       logo.channel,
       logo.url
@@ -270,9 +274,17 @@ for (const logo of logos) {
   }
 }
 
-const streamsByChannel = new Map();
+/* =========================================================
+ * Stream lookup
+ * ========================================================= */
 
-for (const stream of streams) {
+const streamsByChannel =
+  new Map();
+
+for (
+  const stream
+  of streams
+) {
   if (
     !stream.channel ||
     !stream.url
@@ -292,41 +304,10 @@ for (const stream of streams) {
   }
 
   streamsByChannel
-    .get(stream.channel)
+    .get(
+      stream.channel
+    )
     .push(stream);
-}
-
-/* =========================================================
- * Country names
- * ========================================================= */
-
-const countryNames = {
-  DZ: "Algeria",
-  BH: "Bahrain",
-  KM: "Comoros",
-  DJ: "Djibouti",
-  EG: "Egypt",
-  IQ: "Iraq",
-  JO: "Jordan",
-  KW: "Kuwait",
-  LB: "Lebanon",
-  LY: "Libya",
-  MR: "Mauritania",
-  MA: "Morocco",
-  OM: "Oman",
-  PS: "Palestine",
-  QA: "Qatar",
-  SA: "Saudi Arabia",
-  SO: "Somalia",
-  SD: "Sudan",
-  SY: "Syria",
-  TN: "Tunisia",
-  AE: "United Arab Emirates",
-  YE: "Yemen"
-};
-
-function countryName(code) {
-  return countryNames[code] || code;
 }
 
 /* =========================================================
@@ -339,13 +320,17 @@ const adultKeywords = [
   "adults only",
   "18+",
   "18 plus",
+
   "porn",
   "porno",
   "pornography",
+
   "erotic",
   "erotica",
+
   "sex",
   "sexy",
+
   "playboy",
   "penthouse",
   "hustler",
@@ -354,14 +339,20 @@ const adultKeywords = [
   "إباحي",
   "اباحية",
   "إباحية",
+
   "للكبار",
   "للبالغين",
+
   "جنسي",
   "جنسية"
 ];
 
-function isAdultChannel(channel) {
-  if (channel.is_nsfw) {
+function isAdultChannel(
+  channel
+) {
+  if (
+    channel.is_nsfw
+  ) {
     return true;
   }
 
@@ -369,7 +360,9 @@ function isAdultChannel(channel) {
     channel.categories || [];
 
   if (
-    categories.includes("xxx")
+    categories.includes(
+      "xxx"
+    )
   ) {
     return true;
   }
@@ -377,7 +370,10 @@ function isAdultChannel(channel) {
   const text = `
     ${channel.id || ""}
     ${channel.name || ""}
-    ${channel.alt_names?.join(" ") || ""}
+    ${
+      channel.alt_names
+        ?.join(" ") || ""
+    }
   `;
 
   return includesKeyword(
@@ -393,8 +389,10 @@ function isAdultChannel(channel) {
 const copticKeywords = [
   "coptic",
   "copts",
+
   "aghapy",
   "aghapi",
+
   "coptic tv",
   "ctv coptic",
   "coptic orthodox",
@@ -405,11 +403,16 @@ const copticKeywords = [
   "الأقباط"
 ];
 
-function isCopticChannel(channel) {
+function isCopticChannel(
+  channel
+) {
   const text = `
     ${channel.id || ""}
     ${channel.name || ""}
-    ${channel.alt_names?.join(" ") || ""}
+    ${
+      channel.alt_names
+        ?.join(" ") || ""
+    }
   `;
 
   return includesKeyword(
@@ -422,18 +425,29 @@ function isCopticChannel(channel) {
  * Language detection
  * ========================================================= */
 
-function getChannelLanguages(channel) {
-  const detected = new Set();
+function getChannelLanguages(
+  channel
+) {
+  const detected =
+    new Set();
 
+  /*
+   * Channel languages
+   */
   for (
     const language
     of channel.languages || []
   ) {
     detected.add(
-      normalizeLanguage(language)
+      normalizeLanguage(
+        language
+      )
     );
   }
 
+  /*
+   * Feed languages
+   */
   const channelStreams =
     streamsByChannel.get(
       channel.id
@@ -443,7 +457,9 @@ function getChannelLanguages(channel) {
     const stream
     of channelStreams
   ) {
-    if (!stream.feed) {
+    if (
+      !stream.feed
+    ) {
       continue;
     }
 
@@ -461,156 +477,219 @@ function getChannelLanguages(channel) {
       of feed.languages || []
     ) {
       detected.add(
-        normalizeLanguage(language)
+        normalizeLanguage(
+          language
+        )
       );
     }
   }
 
-  return [...detected]
-    .filter(Boolean);
+  return [
+    ...detected
+  ].filter(Boolean);
 }
 
-function isAllowedLanguage(channel) {
+function isAllowedLanguage(
+  channel
+) {
   const languages =
-    getChannelLanguages(channel);
+    getChannelLanguages(
+      channel
+    );
 
   /*
-   * No metadata:
-   * keep channel rather than dropping it.
+   * Missing language metadata:
+   * keep the channel.
    */
-  if (!languages.length) {
+  if (
+    !languages.length
+  ) {
     return true;
   }
 
   /*
-   * At least Arabic or English.
-   *
-   * Example:
-   * Arabic + Hindi = allowed
-   * English + Hindi = allowed
-   * Hindi only = rejected
+   * Accept if Arabic, English or Hindi
+   * is among the known languages.
    */
-  return languages.some(language =>
-    allowedLanguages.has(language)
+  return languages.some(
+    language =>
+      allowedLanguages.has(
+        language
+      )
   );
 }
 
 /* =========================================================
- * Classification keywords
+ * Category keywords
  * ========================================================= */
+
+/* -------------------------
+ * Quran
+ * ------------------------- */
+
+const quranKeywords = [
+  "quran",
+  "qur'an",
+  "koran",
+
+  "holy quran",
+  "quran kareem",
+
+  "قرآن",
+  "القرآن",
+  "القرآن الكريم"
+];
+
+/* -------------------------
+ * Theater / Plays
+ *
+ * Kept as a classification in case IPTV-org or Free-TV
+ * exposes a suitable channel in the future.
+ * ------------------------- */
 
 const theaterKeywords = [
   "theater",
   "theatre",
   "theatrical",
+
   "plays",
+
   "stage play",
   "stage plays",
+
   "live theater",
   "live theatre",
+
   "performing arts",
 
   "masrah",
   "masra7",
+
   "masrahiyat",
   "masrahyat",
+
   "masrahiya",
   "masra7iyat",
 
   "مسرح",
   "المسرح",
+
   "مسرحية",
   "مسرحيات",
   "المسرحيات",
+
   "عرض مسرحي",
   "عروض مسرحية",
+
   "فنون مسرحية"
 ];
 
 const theaterRelatedKeywords = [
   "comedy theater",
   "comedy theatre",
+
   "musical theater",
   "musical theatre",
+
   "stage comedy",
+
   "classic plays",
 
   "مسرح كوميدي",
+
   "مسرحيات كوميدية",
+
   "مسرحيات مصرية",
   "مسرحيات عربية",
+
   "مسرحيات قديمة",
   "مسرحيات كلاسيكية"
 ];
+
+/* -------------------------
+ * Comedy
+ * ------------------------- */
 
 const comedyKeywords = [
   "comedy",
   "comedies",
   "comic",
+
   "funny",
   "laugh",
 
   "ضحك",
+
   "كوميدي",
   "كوميديا",
   "كوميدى"
 ];
 
+/* -------------------------
+ * Family
+ * ------------------------- */
+
 const familyKeywords = [
   "family",
   "families",
+
   "family tv",
   "family channel",
 
   "عائلة",
   "العائلة",
+
   "عائلي",
   "عائلية",
   "عائلى"
 ];
 
+/* -------------------------
+ * Sports
+ * ------------------------- */
+
 const sportsKeywords = [
   "sport",
   "sports",
+
   "football",
   "soccer",
+
   "basketball",
   "tennis",
+
   "racing",
+
   "match",
+  "matches",
 
   "رياضة",
   "رياضي",
   "رياضية",
+
   "كرة",
   "مباريات"
 ];
 
-const quranKeywords = [
-  "quran",
-  "qur'an",
-  "koran",
-  "holy quran",
-  "quran kareem",
-
-  "قرآن",
-  "القرآن"
-];
-
 /* =========================================================
- * Playlist category
+ * Playlist classification
  * ========================================================= */
 
-function getPlaylistCategory(channel) {
+function getPlaylistCategory(
+  channel
+) {
   const channelCategories =
     channel.categories || [];
 
   const name =
     channel.name || "";
 
-  /*
+  /* -------------------------------------------------------
    * 1. Quran
-   */
+   *
+   * Only Egypt + Saudi Arabia.
+   * ------------------------------------------------------- */
+
   if (
     channelCategories.includes(
       "religious"
@@ -626,11 +705,10 @@ function getPlaylistCategory(channel) {
     return "Quran";
   }
 
-  /*
+  /* -------------------------------------------------------
    * 2. Theater
-   *
-   * Higher priority than Comedy / Series.
-   */
+   * ------------------------------------------------------- */
+
   if (
     includesKeyword(
       name,
@@ -640,7 +718,9 @@ function getPlaylistCategory(channel) {
       ]
     ) ||
     (
-      channelCategories.includes("culture") &&
+      channelCategories.includes(
+        "culture"
+      ) &&
       includesKeyword(
         name,
         [
@@ -653,7 +733,9 @@ function getPlaylistCategory(channel) {
       )
     ) ||
     (
-      channelCategories.includes("entertainment") &&
+      channelCategories.includes(
+        "entertainment"
+      ) &&
       includesKeyword(
         name,
         [
@@ -670,9 +752,10 @@ function getPlaylistCategory(channel) {
     return "Theater";
   }
 
-  /*
+  /* -------------------------------------------------------
    * 3. Comedy
-   */
+   * ------------------------------------------------------- */
+
   if (
     channelCategories.includes(
       "comedy"
@@ -685,9 +768,10 @@ function getPlaylistCategory(channel) {
     return "Comedy";
   }
 
-  /*
+  /* -------------------------------------------------------
    * 4. Sports
-   */
+   * ------------------------------------------------------- */
+
   if (
     channelCategories.includes(
       "sports"
@@ -700,9 +784,10 @@ function getPlaylistCategory(channel) {
     return "Sports";
   }
 
-  /*
+  /* -------------------------------------------------------
    * 5. Kids
-   */
+   * ------------------------------------------------------- */
+
   if (
     channelCategories.includes(
       "kids"
@@ -711,9 +796,10 @@ function getPlaylistCategory(channel) {
     return "Kids";
   }
 
-  /*
+  /* -------------------------------------------------------
    * 6. Family
-   */
+   * ------------------------------------------------------- */
+
   if (
     channelCategories.includes(
       "family"
@@ -726,26 +812,31 @@ function getPlaylistCategory(channel) {
     return "Family";
   }
 
-  /*
-   * 7. Series
-   */
+  /* -------------------------------------------------------
+   * 7. Series / Drama
+   * ------------------------------------------------------- */
+
   if (
     channelCategories.includes(
       "series"
     ) ||
-    normalizeName(name).includes(
-      "drama"
-    ) ||
-    normalizeName(name).includes(
-      "دراما"
+    includesKeyword(
+      name,
+      [
+        "drama",
+        "دراما",
+        "series",
+        "مسلسلات"
+      ]
     )
   ) {
     return "Series";
   }
 
-  /*
+  /* -------------------------------------------------------
    * 8. Movies
-   */
+   * ------------------------------------------------------- */
+
   if (
     channelCategories.includes(
       "movies"
@@ -754,10 +845,18 @@ function getPlaylistCategory(channel) {
     const foreignKeywords = [
       "hollywood",
       "bollywood",
+
       "action",
       "thriller",
+
       "english",
       "hindi",
+
+      "cinema one",
+
+      "movies action",
+      "movies thriller",
+
       "osn movies"
     ];
 
@@ -772,13 +871,16 @@ function getPlaylistCategory(channel) {
 
     const arabicMovieKeywords = [
       "rotana cinema",
+
       "aflam",
       "cinema masr",
+
       "arabic",
       "masr",
 
       "افلام",
       "أفلام",
+
       "سينما"
     ];
 
@@ -791,19 +893,25 @@ function getPlaylistCategory(channel) {
       return "Arabic Movies";
     }
 
+    /*
+     * Language fallback
+     */
     const languages =
       getChannelLanguages(
         channel
       );
 
     if (
-      languages.some(language =>
-        [
-          "ar",
-          "ara",
-          "arb",
-          "arabic"
-        ].includes(language)
+      languages.some(
+        language =>
+          [
+            "ar",
+            "ara",
+            "arb",
+            "arabic"
+          ].includes(
+            language
+          )
       )
     ) {
       return "Arabic Movies";
@@ -819,12 +927,18 @@ function getPlaylistCategory(channel) {
  * Stream scoring
  *
  * IMPORTANT:
- * No codec filtering.
  *
- * ffprobe compatibility remains separate.
+ * This is preference scoring ONLY.
+ *
+ * NO codec is blocked.
+ * NO stream is removed based on audio codec.
+ *
+ * ffprobe compatibility stays in check-streams.mjs.
  * ========================================================= */
 
-function scoreStream(stream) {
+function scoreStream(
+  stream
+) {
   let score = 0;
 
   const text =
@@ -832,37 +946,65 @@ function scoreStream(stream) {
       stream.title || ""
     } ${
       stream.label || ""
-    }`.toLowerCase();
+    }`
+      .toLowerCase();
 
+  /*
+   * Obvious source warnings
+   */
   if (
-    text.includes("offline")
+    text.includes(
+      "offline"
+    )
   ) {
     score -= 1000;
   }
 
   if (
-    text.includes("geo-blocked")
+    text.includes(
+      "geo-blocked"
+    )
   ) {
     score -= 50;
   }
 
+  /*
+   * Prefer HLS
+   */
   if (
-    stream.url?.includes(
-      ".m3u8"
-    )
+    stream.url
+      ?.toLowerCase()
+      .includes(
+        ".m3u8"
+      )
   ) {
     score += 40;
   }
 
-  if (!stream.referrer) {
+  /*
+   * Streams without special headers
+   * are easier for car players.
+   */
+  if (
+    !stream.referrer
+  ) {
     score += 15;
   }
 
-  if (!stream.user_agent) {
+  if (
+    !stream.user_agent
+  ) {
     score += 10;
   }
 
-  if (stream.quality) {
+  /*
+   * Moderate resolutions preferred.
+   *
+   * Still NO hard filtering.
+   */
+  if (
+    stream.quality
+  ) {
     const match =
       stream.quality.match(
         /(\d{3,4})p/i
@@ -870,23 +1012,35 @@ function scoreStream(stream) {
 
     if (match) {
       const quality =
-        Number(match[1]);
+        Number(
+          match[1]
+        );
 
-      if (quality === 720) {
+      if (
+        quality === 720
+      ) {
         score += 40;
-      } else if (
+      }
+
+      else if (
         quality === 1080
       ) {
         score += 35;
-      } else if (
+      }
+
+      else if (
         quality === 576
       ) {
         score += 25;
-      } else if (
+      }
+
+      else if (
         quality === 480
       ) {
         score += 20;
-      } else if (
+      }
+
+      else if (
         quality > 1080
       ) {
         score -= 10;
@@ -905,11 +1059,15 @@ function selectBestStream(
       channel.id
     ) || [];
 
-  if (!available.length) {
+  if (
+    !available.length
+  ) {
     return null;
   }
 
-  return [...available].sort(
+  return [
+    ...available
+  ].sort(
     (a, b) =>
       scoreStream(b) -
       scoreStream(a)
@@ -922,15 +1080,16 @@ function selectBestStream(
 
 const selected = [];
 
-for (const channel of channels) {
+for (
+  const channel
+  of channels
+) {
 
-  /*
-   * Arab countries ONLY
-   */
+  /* -------------------------------------------------------
+   * Allowed countries ONLY
+   * ------------------------------------------------------- */
+
   if (
-    !arabCountries.has(
-      channel.country
-    ) ||
     !allowedArabCountries.has(
       channel.country
     )
@@ -939,46 +1098,71 @@ for (const channel of channels) {
   }
 
   /*
-   * Adult / XXX
+   * Extra safety:
+   * country should also be in IPTV-org ARAB region.
    */
   if (
-    isAdultChannel(channel)
+    !arabRegionCountries.has(
+      channel.country
+    )
   ) {
     continue;
   }
 
-  /*
+  /* -------------------------------------------------------
+   * Adult
+   * ------------------------------------------------------- */
+
+  if (
+    isAdultChannel(
+      channel
+    )
+  ) {
+    continue;
+  }
+
+  /* -------------------------------------------------------
    * Coptic
-   */
+   * ------------------------------------------------------- */
+
   if (
-    isCopticChannel(channel)
+    isCopticChannel(
+      channel
+    )
   ) {
     continue;
   }
 
-  /*
-   * Arabic / English
-   * Hindi can coexist with Arabic/English.
-   */
+  /* -------------------------------------------------------
+   * Languages
+   * ------------------------------------------------------- */
+
   if (
-    !isAllowedLanguage(channel)
+    !isAllowedLanguage(
+      channel
+    )
   ) {
     continue;
   }
 
   const isEgypt =
-    channel.country === "EG";
+    channel.country ===
+    "EG";
 
   const isWantedCategory =
-    channel.categories?.some(
-      category =>
-        sourceCategories.has(
-          category
-        )
-    );
+    channel.categories
+      ?.some(
+        category =>
+          sourceCategories.has(
+            category
+          )
+      );
 
   /*
-   * Egypt remains broad
+   * Egypt is intentionally broader.
+   *
+   * This allows general Egyptian TV/news
+   * channels into Egypt TV.
    */
   if (
     !isEgypt &&
@@ -993,23 +1177,30 @@ for (const channel of channels) {
     );
 
   /*
-   * Egypt general/news fallback
+   * Egypt fallback
    */
   if (
     !category &&
-    channel.country === "EG"
+    isEgypt
   ) {
-    category = "Egypt TV";
+    category =
+      "Egypt TV";
   }
 
-  if (!category) {
+  if (
+    !category
+  ) {
     continue;
   }
 
   const stream =
-    selectBestStream(channel);
+    selectBestStream(
+      channel
+    );
 
-  if (!stream) {
+  if (
+    !stream
+  ) {
     continue;
   }
 
@@ -1017,17 +1208,21 @@ for (const channel of channels) {
     channel,
     stream,
     category,
-    source: "IPTV-org"
+    source:
+      "IPTV-org"
   });
 }
 
 /* =========================================================
- * Generic M3U parser
+ * M3U parser
  * ========================================================= */
 
 function parseM3U(text) {
   const lines =
-    text.split(/\r?\n/);
+    String(text || "")
+      .split(
+        /\r?\n/
+      );
 
   const result = [];
 
@@ -1049,6 +1244,9 @@ function parseM3U(text) {
 
     let url = "";
 
+    /*
+     * Find next non-comment URL.
+     */
     for (
       let j = i + 1;
       j < lines.length;
@@ -1075,9 +1273,13 @@ function parseM3U(text) {
 
     const name =
       line.includes(",")
-        ? line.substring(
-            line.lastIndexOf(",") + 1
-          ).trim()
+        ? line
+            .substring(
+              line.lastIndexOf(
+                ","
+              ) + 1
+            )
+            .trim()
         : "Unknown";
 
     const groupMatch =
@@ -1108,23 +1310,31 @@ function parseM3U(text) {
     result.push({
       name,
       url,
-      raw: line,
+
+      raw:
+        line,
 
       group:
-        groupMatch?.[1] || "",
+        groupMatch
+          ?.[1] || "",
 
       tvgId:
-        idMatch?.[1] || "",
+        idMatch
+          ?.[1] || "",
 
       logo:
-        logoMatch?.[1] || "",
+        logoMatch
+          ?.[1] || "",
 
       country:
-        countryMatch?.[1]
-          ?.toUpperCase() || "",
+        countryMatch
+          ?.[1]
+          ?.toUpperCase() ||
+        "",
 
       language:
-        languageMatch?.[1] || ""
+        languageMatch
+          ?.[1] || ""
     });
   }
 
@@ -1132,81 +1342,9 @@ function parseM3U(text) {
 }
 
 const freeTvChannels =
-  parseM3U(freeTvText);
-
-const arabicExtraChannels =
-  parseM3U(arabicExtraText);
-
-/* =========================================================
- * External country detection
- * ========================================================= */
-
-function inferCountryFromTvgId(
-  tvgId
-) {
-  if (!tvgId) {
-    return null;
-  }
-
-  /*
-   * Handles:
-   *
-   * Channel.eg
-   * Channel.eg@SD
-   * Channel.sa@HD
-   */
-  const cleanId =
-    tvgId
-      .split("@")[0]
-      .trim();
-
-  const match =
-    cleanId.match(
-      /\.([a-z]{2})$/i
-    );
-
-  if (!match) {
-    return null;
-  }
-
-  return match[1]
-    .toUpperCase();
-}
-
-function getExternalChannelCountry(
-  item
-) {
-  /*
-   * Explicit country first
-   */
-  if (
-    item.country &&
-    allowedArabCountries.has(
-      item.country
-    )
-  ) {
-    return item.country;
-  }
-
-  /*
-   * Otherwise infer from tvg-id
-   */
-  const inferred =
-    inferCountryFromTvgId(
-      item.tvgId
-    );
-
-  if (
-    inferred &&
-    allowedArabCountries.has(
-      inferred
-    )
-  ) {
-    return inferred;
-  }
-
-  return null;
-}
+  parseM3U(
+    freeTvText
+  );
 
 /* =========================================================
  * External source filters
@@ -1242,26 +1380,10 @@ function isCopticExternalChannel(
   );
 }
 
-function isTheaterExternalChannel(
-  item
-) {
-  const text = `
-    ${item.name || ""}
-    ${item.group || ""}
-    ${item.tvgId || ""}
-  `;
-
-  return includesKeyword(
-    text,
-    [
-      ...theaterKeywords,
-      ...theaterRelatedKeywords
-    ]
-  );
-}
-
 /* =========================================================
- * Egypt enrichment
+ * Egypt enrichment from Free-TV
+ *
+ * Free-TV is currently used ONLY for Egypt.
  * ========================================================= */
 
 const egyptWanted = [
@@ -1293,23 +1415,33 @@ const egyptWanted = [
   "sada el balad drama",
 
   "rotana cinema",
+
   "mix hollywood",
 
   "koogi",
 
   "al masriyah",
+
   "watan tv",
 
   "comedy",
+
   "family",
 
+  /*
+   * Theater keywords remain here.
+   * If Free-TV adds such a channel in the future,
+   * it can be classified automatically.
+   */
   "theater",
   "theatre",
   "plays",
   "stage",
+
   "masrah",
   "masrahiyat",
   "masrahyat",
+
   "مسرح",
   "مسرحيات",
   "مسرحية",
@@ -1326,20 +1458,29 @@ function isWantedEgyptChannel(
   return egyptWanted.some(
     wanted =>
       normalized.includes(
-        normalizeName(wanted)
+        normalizeName(
+          wanted
+        )
       )
   );
 }
+
+/* =========================================================
+ * Egypt classification
+ * ========================================================= */
 
 function classifyEgyptChannel(
   name
 ) {
   const n =
-    normalizeName(name);
+    normalizeName(
+      name
+    );
 
-  /*
+  /* -------------------------------------------------------
    * Theater
-   */
+   * ------------------------------------------------------- */
+
   if (
     includesKeyword(
       n,
@@ -1352,9 +1493,10 @@ function classifyEgyptChannel(
     return "Theater";
   }
 
-  /*
+  /* -------------------------------------------------------
    * Comedy
-   */
+   * ------------------------------------------------------- */
+
   if (
     includesKeyword(
       n,
@@ -1364,9 +1506,10 @@ function classifyEgyptChannel(
     return "Comedy";
   }
 
-  /*
+  /* -------------------------------------------------------
    * Sports
-   */
+   * ------------------------------------------------------- */
+
   if (
     includesKeyword(
       n,
@@ -1376,20 +1519,28 @@ function classifyEgyptChannel(
     return "Sports";
   }
 
-  /*
+  /* -------------------------------------------------------
    * Kids
-   */
+   * ------------------------------------------------------- */
+
   if (
-    n.includes("koogi") ||
-    n.includes("kids") ||
-    n.includes("أطفال")
+    includesKeyword(
+      n,
+      [
+        "koogi",
+        "kids",
+        "children",
+        "أطفال"
+      ]
+    )
   ) {
     return "Kids";
   }
 
-  /*
+  /* -------------------------------------------------------
    * Family
-   */
+   * ------------------------------------------------------- */
+
   if (
     includesKeyword(
       n,
@@ -1399,45 +1550,61 @@ function classifyEgyptChannel(
     return "Family";
   }
 
-  /*
-   * Series / Drama
-   */
+  /* -------------------------------------------------------
+   * Series
+   * ------------------------------------------------------- */
+
   if (
-    n.includes("drama") ||
-    n.includes("دراما") ||
-    n.includes("مسلسلات")
+    includesKeyword(
+      n,
+      [
+        "drama",
+        "دراما",
+        "series",
+        "مسلسلات"
+      ]
+    )
   ) {
     return "Series";
   }
 
-  /*
+  /* -------------------------------------------------------
    * Foreign movies
-   */
+   * ------------------------------------------------------- */
+
   if (
     includesKeyword(
       n,
       [
         "hollywood",
+        "bollywood",
+
         "action",
         "thriller",
-        "bollywood"
+
+        "english",
+        "hindi"
       ]
     )
   ) {
     return "Foreign Movies";
   }
 
-  /*
+  /* -------------------------------------------------------
    * Arabic movies
-   */
+   * ------------------------------------------------------- */
+
   if (
     includesKeyword(
       n,
       [
         "rotana cinema",
+
         "cinema",
         "aflam",
+
         "سينما",
+
         "افلام",
         "أفلام"
       ]
@@ -1453,40 +1620,86 @@ function classifyEgyptChannel(
  * Dedupe helpers
  * ========================================================= */
 
-function channelKey(name) {
-  return normalizeName(name)
-    .replace(/\bhd\b/g, "")
-    .replace(/\bsd\b/g, "")
-    .replace(/\bfhd\b/g, "")
-    .replace(/\b4k\b/g, "")
-    .replace(/\b1080p\b/g, "")
-    .replace(/\b720p\b/g, "")
-    .replace(/\b576p\b/g, "")
-    .replace(/\b480p\b/g, "")
+function channelKey(
+  name
+) {
+  return normalizeName(
+    name
+  )
+    .replace(
+      /\bhd\b/g,
+      ""
+    )
+    .replace(
+      /\bsd\b/g,
+      ""
+    )
+    .replace(
+      /\bfhd\b/g,
+      ""
+    )
+    .replace(
+      /\buhd\b/g,
+      ""
+    )
+    .replace(
+      /\b4k\b/g,
+      ""
+    )
+    .replace(
+      /\b1080p\b/g,
+      ""
+    )
+    .replace(
+      /\b720p\b/g,
+      ""
+    )
+    .replace(
+      /\b576p\b/g,
+      ""
+    )
+    .replace(
+      /\b480p\b/g,
+      ""
+    )
+    .replace(
+      /\s+/g,
+      " "
+    )
     .trim();
 }
 
-function streamKey(url) {
-  return String(url || "")
+function streamKey(
+  url
+) {
+  return String(
+    url || ""
+  )
     .trim()
     .toLowerCase();
 }
 
+/* =========================================================
+ * Existing dedupe indexes
+ * ========================================================= */
+
 const existingNames =
   new Set(
-    selected.map(item =>
-      channelKey(
-        item.channel.name
-      )
+    selected.map(
+      item =>
+        channelKey(
+          item.channel.name
+        )
     )
   );
 
 const existingStreams =
   new Set(
-    selected.map(item =>
-      streamKey(
-        item.stream.url
-      )
+    selected.map(
+      item =>
+        streamKey(
+          item.stream.url
+        )
     )
   );
 
@@ -1499,31 +1712,61 @@ for (
   of freeTvChannels
 ) {
   const group =
-    normalizeName(item.group);
+    normalizeName(
+      item.group
+    );
 
   /*
-   * Free-TV enrichment = Egypt only
+   * Free-TV enrichment is Egypt only.
    */
   const isEgypt =
     group === "egypt" ||
-    group.includes("egypt");
-
-  if (!isEgypt) {
-    continue;
-  }
+    group.includes(
+      "egypt"
+    );
 
   if (
-    isAdultExternalChannel(item)
+    !isEgypt
   ) {
     continue;
   }
 
+  /*
+   * Egypt must be an allowed country.
+   */
   if (
-    isCopticExternalChannel(item)
+    !allowedArabCountries.has(
+      "EG"
+    )
   ) {
     continue;
   }
 
+  /*
+   * Adult
+   */
+  if (
+    isAdultExternalChannel(
+      item
+    )
+  ) {
+    continue;
+  }
+
+  /*
+   * Coptic
+   */
+  if (
+    isCopticExternalChannel(
+      item
+    )
+  ) {
+    continue;
+  }
+
+  /*
+   * Selected Egypt channels only
+   */
   if (
     !isWantedEgyptChannel(
       item.name
@@ -1532,27 +1775,55 @@ for (
     continue;
   }
 
-  const key =
-    channelKey(item.name);
-
-  const urlKey =
-    streamKey(item.url);
-
+  /*
+   * Valid HTTP stream
+   */
   if (
-    existingNames.has(key) ||
-    existingStreams.has(urlKey)
+    !item.url ||
+    !/^https?:\/\//i.test(
+      item.url
+    )
   ) {
     continue;
   }
 
-  existingNames.add(key);
-  existingStreams.add(urlKey);
+  const nameKey =
+    channelKey(
+      item.name
+    );
+
+  const urlKey =
+    streamKey(
+      item.url
+    );
+
+  /*
+   * Dedupe
+   */
+  if (
+    existingNames.has(
+      nameKey
+    ) ||
+    existingStreams.has(
+      urlKey
+    )
+  ) {
+    continue;
+  }
+
+  existingNames.add(
+    nameKey
+  );
+
+  existingStreams.add(
+    urlKey
+  );
 
   selected.push({
     channel: {
       id:
         item.tvgId ||
-        `FreeTV.${key
+        `FreeTV.${nameKey
           .replace(
             /\s+/g,
             ""
@@ -1584,188 +1855,79 @@ for (
 }
 
 /* =========================================================
- * Extra Arabic source
- *
- * Theater channels ONLY
- * ========================================================= */
-
-let extraTheaterAdded = 0;
-
-for (
-  const item
-  of arabicExtraChannels
-) {
-
-  /*
-   * Arab countries only
-   */
-  const country =
-    getExternalChannelCountry(
-      item
-    );
-
-  if (!country) {
-    continue;
-  }
-
-  /*
-   * Adult filter
-   */
-  if (
-    isAdultExternalChannel(
-      item
-    )
-  ) {
-    continue;
-  }
-
-  /*
-   * Coptic filter
-   */
-  if (
-    isCopticExternalChannel(
-      item
-    )
-  ) {
-    continue;
-  }
-
-  /*
-   * Extra source is ONLY used
-   * for Theater discovery.
-   */
-  if (
-    !isTheaterExternalChannel(
-      item
-    )
-  ) {
-    continue;
-  }
-
-  /*
-   * HTTP / HTTPS streams only
-   */
-  if (
-    !item.url ||
-    !/^https?:\/\//i.test(
-      item.url
-    )
-  ) {
-    continue;
-  }
-
-  const nameKey =
-    channelKey(item.name);
-
-  const urlKey =
-    streamKey(item.url);
-
-  /*
-   * Dedupe name and URL
-   */
-  if (
-    existingNames.has(nameKey) ||
-    existingStreams.has(urlKey)
-  ) {
-    continue;
-  }
-
-  existingNames.add(nameKey);
-  existingStreams.add(urlKey);
-
-  selected.push({
-    channel: {
-      id:
-        item.tvgId ||
-        `ArabicExtra.${country}.${nameKey
-          .replace(
-            /\s+/g,
-            ""
-          )}`,
-
-      name:
-        item.name,
-
-      country
-    },
-
-    stream: {
-      url:
-        item.url
-    },
-
-    category:
-      "Theater",
-
-    logo:
-      item.logo,
-
-    source:
-      "Arabic-Extra"
-  });
-
-  extraTheaterAdded++;
-}
-
-/* =========================================================
  * Final safety filtering
  * ========================================================= */
 
 const finalSelected =
-  selected.filter(item => {
+  selected.filter(
+    item => {
 
-    /*
-     * Arab countries ONLY
-     */
-    if (
-      !allowedArabCountries.has(
-        item.channel.country
-      )
-    ) {
-      return false;
+      /*
+       * Selected countries ONLY.
+       */
+      if (
+        !allowedArabCountries.has(
+          item.channel.country
+        )
+      ) {
+        return false;
+      }
+
+      /*
+       * Adult
+       */
+      if (
+        isAdultChannel(
+          item.channel
+        )
+      ) {
+        return false;
+      }
+
+      /*
+       * Coptic
+       */
+      if (
+        isCopticChannel(
+          item.channel
+        )
+      ) {
+        return false;
+      }
+
+      return true;
     }
-
-    /*
-     * Adult safety
-     */
-    if (
-      isAdultChannel(
-        item.channel
-      )
-    ) {
-      return false;
-    }
-
-    /*
-     * Coptic safety
-     */
-    if (
-      isCopticChannel(
-        item.channel
-      )
-    ) {
-      return false;
-    }
-
-    return true;
-  });
+  );
 
 /* =========================================================
- * Sorting
+ * Category sort order
  * ========================================================= */
 
 const categoryOrder = {
   Quran: 1,
+
   Kids: 2,
+
   Family: 3,
+
   Comedy: 4,
+
   Theater: 5,
+
   Series: 6,
+
   "Arabic Movies": 7,
+
   "Foreign Movies": 8,
+
   Sports: 9,
+
   "Egypt TV": 10
 };
+
+/* =========================================================
+ * Sorting
+ * ========================================================= */
 
 finalSelected.sort(
   (a, b) => {
@@ -1780,14 +1942,21 @@ finalSelected.sort(
         b.channel.country
       );
 
+    /*
+     * Country
+     */
     if (
-      countryA !== countryB
+      countryA !==
+      countryB
     ) {
       return countryA.localeCompare(
         countryB
       );
     }
 
+    /*
+     * Category
+     */
     const orderA =
       categoryOrder[
         a.category
@@ -1799,16 +1968,24 @@ finalSelected.sort(
       ] ?? 99;
 
     if (
-      orderA !== orderB
+      orderA !==
+      orderB
     ) {
-      return orderA -
-        orderB;
+      return (
+        orderA -
+        orderB
+      );
     }
 
-    return (
+    /*
+     * Channel name
+     */
+    return String(
       a.channel.name || ""
     ).localeCompare(
-      b.channel.name || ""
+      String(
+        b.channel.name || ""
+      )
     );
   }
 );
@@ -1819,16 +1996,30 @@ finalSelected.sort(
 
 const output = [];
 
+/*
+ * EPG
+ */
 output.push(
   '#EXTM3U x-tvg-url="https://raw.githubusercontent.com/StrangeDrVN/epg/public/output/guide.xml.gz"'
 );
 
+/*
+ * Generator info
+ */
 output.push(
-  "# Generated automatically from IPTV-org + Free-TV + Arabic Extra"
+  "# Generated automatically from IPTV-org + Free-TV"
 );
 
 output.push(
-  "# Filters: Arab countries + Arabic/English primary + No Adult + No Coptic"
+  "# Countries: BH, EG, JO, KW, PS, QA, SA, SY, TN, AE"
+);
+
+output.push(
+  "# Filters: Selected Arab countries + Arabic/English/Hindi + No Adult + No Coptic"
+);
+
+output.push(
+  "# Playback: No codec-based channel filtering"
 );
 
 output.push(
@@ -1837,7 +2028,12 @@ output.push(
 
 output.push("");
 
-let currentGroup = null;
+/* =========================================================
+ * Playlist entries
+ * ========================================================= */
+
+let currentGroup =
+  null;
 
 for (
   const item
@@ -1857,8 +2053,12 @@ for (
   const group =
     `${country} | ${category}`;
 
+  /*
+   * Group header
+   */
   if (
-    group !== currentGroup
+    group !==
+    currentGroup
   ) {
     currentGroup =
       group;
@@ -1868,6 +2068,9 @@ for (
     );
   }
 
+  /*
+   * Logo
+   */
   const logo =
     item.logo ||
     logoMap.get(
@@ -1875,9 +2078,13 @@ for (
     ) ||
     "";
 
+  /*
+   * Channel name
+   */
   const name =
     String(
-      channel.name || ""
+      channel.name ||
+      ""
     )
       .replace(
         /\r?\n/g,
@@ -1897,12 +2104,34 @@ for (
       "'"
     );
 
+  const safeId =
+    String(
+      channel.id ||
+      ""
+    ).replace(
+      /"/g,
+      "'"
+    );
+
+  const safeLogo =
+    String(
+      logo ||
+      ""
+    ).replace(
+      /"/g,
+      "%22"
+    );
+
+  /*
+   * EXTINF attributes
+   */
   const attributes = [
-    `tvg-id="${channel.id || ""}"`,
+    `tvg-id="${safeId}"`,
+
     `tvg-name="${safeName}"`,
 
-    logo
-      ? `tvg-logo="${logo}"`
+    safeLogo
+      ? `tvg-logo="${safeLogo}"`
       : "",
 
     `group-title="${safeGroup}"`
@@ -1944,10 +2173,56 @@ await fs.writeFile(
 
 console.log("");
 console.log(
-  `Generated ${finalSelected.length} channels.`
+  "================================="
 );
 
+console.log(
+  `✅ Generated ${finalSelected.length} channels`
+);
+
+console.log(
+  "================================="
+);
+
+/* =========================================================
+ * Country summary
+ * ========================================================= */
+
+const countrySummary = {};
+
+for (
+  const item
+  of finalSelected
+) {
+  const country =
+    countryName(
+      item.channel.country
+    );
+
+  countrySummary[country] =
+    (
+      countrySummary[
+        country
+      ] || 0
+    ) + 1;
+}
+
 console.log("");
+console.log(
+  "Countries"
+);
+
+console.log(
+  "================================="
+);
+
+console.table(
+  countrySummary
+);
+
+/* =========================================================
+ * Category summary
+ * ========================================================= */
 
 const categorySummary = {};
 
@@ -1961,14 +2236,14 @@ for (
     )} | ${item.category}`;
 
   categorySummary[key] =
-    (categorySummary[key] || 0) +
-    1;
+    (
+      categorySummary[
+        key
+      ] || 0
+    ) + 1;
 }
 
-console.log(
-  "================================="
-);
-
+console.log("");
 console.log(
   "Categories"
 );
@@ -1992,18 +2267,18 @@ for (
   of finalSelected
 ) {
   const source =
-    item.source || "Unknown";
+    item.source ||
+    "Unknown";
 
   sourceSummary[source] =
-    (sourceSummary[source] || 0) +
-    1;
+    (
+      sourceSummary[
+        source
+      ] || 0
+    ) + 1;
 }
 
 console.log("");
-console.log(
-  "================================="
-);
-
 console.log(
   "Sources"
 );
@@ -2017,7 +2292,7 @@ console.table(
 );
 
 /* =========================================================
- * Filter summary
+ * Configuration summary
  * ========================================================= */
 
 console.log("");
@@ -2026,7 +2301,7 @@ console.log(
 );
 
 console.log(
-  "Playlist filters"
+  "Playlist configuration"
 );
 
 console.log(
@@ -2034,15 +2309,63 @@ console.log(
 );
 
 console.log(
-  "✅ Arab countries only"
+  "✅ IPTV-org"
 );
 
 console.log(
-  "✅ Arabic / English primary languages"
+  "✅ Free-TV"
 );
 
 console.log(
-  "✅ Hindi can coexist where needed"
+  "✅ Bahrain"
+);
+
+console.log(
+  "✅ Egypt"
+);
+
+console.log(
+  "✅ Jordan"
+);
+
+console.log(
+  "✅ Kuwait"
+);
+
+console.log(
+  "✅ Palestine"
+);
+
+console.log(
+  "✅ Qatar"
+);
+
+console.log(
+  "✅ Saudi Arabia"
+);
+
+console.log(
+  "✅ Syria"
+);
+
+console.log(
+  "✅ Tunisia"
+);
+
+console.log(
+  "✅ United Arab Emirates"
+);
+
+console.log(
+  "✅ Arabic"
+);
+
+console.log(
+  "✅ English"
+);
+
+console.log(
+  "✅ Hindi allowed"
 );
 
 console.log(
@@ -2050,27 +2373,55 @@ console.log(
 );
 
 console.log(
-  "✅ Coptic channels removed"
+  "✅ Coptic channels blocked"
 );
 
 console.log(
-  "✅ Sports category"
+  "✅ Quran"
 );
 
 console.log(
-  "✅ Theater category"
+  "✅ Kids"
 );
 
 console.log(
-  "✅ Comedy category"
+  "✅ Family"
 );
 
 console.log(
-  "✅ Family category"
+  "✅ Comedy"
 );
 
 console.log(
-  `✅ Extra Theater channels added: ${extraTheaterAdded}`
+  "✅ Theater classification ready"
+);
+
+console.log(
+  "✅ Series"
+);
+
+console.log(
+  "✅ Arabic Movies"
+);
+
+console.log(
+  "✅ Foreign Movies"
+);
+
+console.log(
+  "✅ Sports"
+);
+
+console.log(
+  "✅ Egypt general TV"
+);
+
+console.log(
+  "✅ Audio-only / Radio streams allowed"
+);
+
+console.log(
+  "✅ No codec-based stream removal"
 );
 
 console.log(

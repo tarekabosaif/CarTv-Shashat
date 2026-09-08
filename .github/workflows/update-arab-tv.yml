@@ -42,7 +42,10 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          git add playlists/arab-tv.m3u playlists/compatibility-report.json
+          git add \
+            playlists/arab-tv.m3u \
+            playlists/theater-vod.json \
+            playlists/compatibility-report.json
 
           if git diff --cached --quiet; then
             echo "No changes."

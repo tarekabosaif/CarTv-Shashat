@@ -4,8 +4,7 @@ import fs from "node:fs/promises";
  * Sources
  * ========================================================= */
 
-const API =
-  "https://iptv-org.github.io/api";
+const API = "https://iptv-org.github.io/api";
 
 const FREE_TV_URL =
   "https://raw.githubusercontent.com/Free-TV/IPTV/master/playlist.m3u8";
@@ -15,8 +14,7 @@ const FREE_TV_URL =
  * ========================================================= */
 
 async function fetchJson(url) {
-  const response =
-    await fetch(url);
+  const response = await fetch(url);
 
   if (!response.ok) {
     throw new Error(
@@ -28,8 +26,7 @@ async function fetchJson(url) {
 }
 
 async function fetchText(url) {
-  const response =
-    await fetch(url);
+  const response = await fetch(url);
 
   if (!response.ok) {
     throw new Error(
@@ -44,9 +41,7 @@ async function fetchText(url) {
  * Load sources
  * ========================================================= */
 
-console.log(
-  "Loading IPTV-org + Free-TV..."
-);
+console.log("Loading IPTV-org + Free-TV...");
 
 const [
   channels,
@@ -56,34 +51,15 @@ const [
   logos,
   freeTvText
 ] = await Promise.all([
-  fetchJson(
-    `${API}/channels.json`
-  ),
-
-  fetchJson(
-    `${API}/streams.json`
-  ),
-
-  fetchJson(
-    `${API}/feeds.json`
-  ),
-
-  fetchJson(
-    `${API}/regions.json`
-  ),
-
-  fetchJson(
-    `${API}/logos.json`
-  ),
-
-  fetchText(
-    FREE_TV_URL
-  )
+  fetchJson(`${API}/channels.json`),
+  fetchJson(`${API}/streams.json`),
+  fetchJson(`${API}/feeds.json`),
+  fetchJson(`${API}/regions.json`),
+  fetchJson(`${API}/logos.json`),
+  fetchText(FREE_TV_URL)
 ]);
 
-console.log(
-  "✅ Sources loaded."
-);
+console.log("✅ Sources loaded.");
 
 /* =========================================================
  * Helpers
@@ -92,23 +68,13 @@ console.log(
 function normalizeName(name) {
   return String(name || "")
     .toLowerCase()
-    .replace(
-      /[^\p{L}\p{N}]+/gu,
-      " "
-    )
-    .replace(
-      /\s+/g,
-      " "
-    )
+    .replace(/[^\p{L}\p{N}]+/gu, " ")
+    .replace(/\s+/g, " ")
     .trim();
 }
 
-function includesKeyword(
-  text,
-  keywords
-) {
-  const normalized =
-    normalizeName(text);
+function includesKeyword(text, keywords) {
+  const normalized = normalizeName(text);
 
   return keywords.some(
     keyword =>
@@ -121,10 +87,7 @@ function includesKeyword(
 /* =========================================================
  * Allowed countries
  *
- * This object is now the SINGLE source of truth.
- *
- * Add/remove a country here and the playlist filter
- * automatically follows it.
+ * SINGLE SOURCE OF TRUTH
  * ========================================================= */
 
 const countryNames = {
@@ -141,29 +104,20 @@ const countryNames = {
 };
 
 const allowedArabCountries =
-  new Set(
-    Object.keys(
-      countryNames
-    )
-  );
+  new Set(Object.keys(countryNames));
 
 function countryName(code) {
-  return (
-    countryNames[code] ||
-    code
-  );
+  return countryNames[code] || code;
 }
 
 /* =========================================================
- * Confirm ARAB region exists
+ * Confirm ARAB region
  * ========================================================= */
 
 const arabRegion =
   regions.find(
     region =>
-      region.code
-        ?.toUpperCase() ===
-      "ARAB"
+      region.code?.toUpperCase() === "ARAB"
   );
 
 if (!arabRegion) {
@@ -178,40 +132,27 @@ const arabRegionCountries =
   );
 
 /* =========================================================
- * Allowed primary languages
- *
- * Arabic and English are preferred.
- *
- * Hindi is NOT globally blocked because channels such as
- * MBC Bollywood / Zee Alwan are intentionally allowed
- * when they belong to our selected Arab countries.
+ * Allowed languages
  * ========================================================= */
 
-const allowedLanguages =
-  new Set([
-    "ar",
-    "ara",
-    "arb",
-    "arabic",
+const allowedLanguages = new Set([
+  "ar",
+  "ara",
+  "arb",
+  "arabic",
 
-    "en",
-    "eng",
-    "english",
+  "en",
+  "eng",
+  "english",
 
-    /*
-     * Explicitly allowed
-     */
-    "hi",
-    "hin",
-    "hindi"
-  ]);
+  // Kept for MBC Bollywood / Zee Alwan etc.
+  "hi",
+  "hin",
+  "hindi"
+]);
 
-function normalizeLanguage(
-  language
-) {
-  return String(
-    language || ""
-  )
+function normalizeLanguage(language) {
+  return String(language || "")
     .trim()
     .toLowerCase();
 }
@@ -220,18 +161,17 @@ function normalizeLanguage(
  * Source categories
  * ========================================================= */
 
-const sourceCategories =
-  new Set([
-    "series",
-    "sports",
-    "kids",
-    "movies",
-    "religious",
-    "comedy",
-    "family",
-    "entertainment",
-    "culture"
-  ]);
+const sourceCategories = new Set([
+  "series",
+  "sports",
+  "kids",
+  "movies",
+  "religious",
+  "comedy",
+  "family",
+  "entertainment",
+  "culture"
+]);
 
 /* =========================================================
  * Feed lookup
@@ -251,22 +191,14 @@ const feedMap =
  * Logo lookup
  * ========================================================= */
 
-const logoMap =
-  new Map();
+const logoMap = new Map();
 
-for (
-  const logo
-  of logos
-) {
+for (const logo of logos) {
   if (!logo.in_use) {
     continue;
   }
 
-  if (
-    !logoMap.has(
-      logo.channel
-    )
-  ) {
+  if (!logoMap.has(logo.channel)) {
     logoMap.set(
       logo.channel,
       logo.url
@@ -281,10 +213,7 @@ for (
 const streamsByChannel =
   new Map();
 
-for (
-  const stream
-  of streams
-) {
+for (const stream of streams) {
   if (
     !stream.channel ||
     !stream.url
@@ -304,9 +233,7 @@ for (
   }
 
   streamsByChannel
-    .get(
-      stream.channel
-    )
+    .get(stream.channel)
     .push(stream);
 }
 
@@ -347,12 +274,8 @@ const adultKeywords = [
   "جنسية"
 ];
 
-function isAdultChannel(
-  channel
-) {
-  if (
-    channel.is_nsfw
-  ) {
+function isAdultChannel(channel) {
+  if (channel.is_nsfw) {
     return true;
   }
 
@@ -360,9 +283,7 @@ function isAdultChannel(
     channel.categories || [];
 
   if (
-    categories.includes(
-      "xxx"
-    )
+    categories.includes("xxx")
   ) {
     return true;
   }
@@ -383,41 +304,156 @@ function isAdultChannel(
 }
 
 /* =========================================================
- * Coptic filter
+ * Coptic / Coptic Orthodox filter
+ *
+ * Removes Coptic channels from all sources.
  * ========================================================= */
 
 const copticKeywords = [
+  /* Generic */
+
   "coptic",
   "copts",
+  "copt",
+
+  "coptic tv",
+  "coptic channel",
+  "coptic satellite",
+  "coptic satellite channel",
+
+  "coptic orthodox",
+  "coptic orthodox tv",
+  "coptic orthodox church",
+
+  "orthodox coptic",
+
+  /* Arabic */
+
+  "قبطي",
+  "قبطى",
+
+  "قبطية",
+  "قبطيه",
+
+  "القبطية",
+  "القبطيه",
+
+  "الأقباط",
+  "الاقباط",
+
+  "الكنيسة القبطية",
+  "الكنيسه القبطيه",
+
+  "الكنيسة القبطية الأرثوذكسية",
+  "الكنيسه القبطيه الارثوذكسيه",
+
+  /* Aghapy */
 
   "aghapy",
   "aghapi",
+  "aghapy tv",
 
-  "coptic tv",
+  /* ME Sat */
+
+  "me sat",
+  "mesat",
+  "me sat tv",
+
+  /* Logos */
+
+  "logos tv",
+  "logos coptic",
+  "logos coptic channel",
+
+  /* CTV
+   *
+   * Do NOT block "ctv" alone because
+   * unrelated channels may use it.
+   */
+
   "ctv coptic",
-  "coptic orthodox",
+  "coptic ctv",
+  "ctv egypt",
+  "ctv eg",
 
-  "قبطي",
-  "قبطية",
-  "القبطية",
-  "الأقباط"
+  /* Coptic Youth */
+
+  "coptic youth",
+  "coptic youth channel",
+
+  /* Saints / church related names */
+
+  "st mark coptic",
+  "saint mark coptic",
+
+  "st mary coptic",
+  "saint mary coptic",
+
+  "pope shenouda",
+  "shenouda tv"
 ];
 
+function getCopticSearchText(
+  channel
+) {
+  return `
+    ${channel.id || ""}
+    ${channel.name || ""}
+    ${(channel.alt_names || []).join(" ")}
+    ${(channel.categories || []).join(" ")}
+    ${channel.network || ""}
+    ${channel.owner || ""}
+  `;
+}
+
 function isCopticChannel(
+  channel
+) {
+  return includesKeyword(
+    getCopticSearchText(
+      channel
+    ),
+    copticKeywords
+  );
+}
+
+/* =========================================================
+ * Explicit blocked channels
+ * ========================================================= */
+
+const blockedChannelKeywords = [
+  "koogi",
+  "koogi tv"
+];
+
+function isBlockedChannel(
   channel
 ) {
   const text = `
     ${channel.id || ""}
     ${channel.name || ""}
-    ${
-      channel.alt_names
-        ?.join(" ") || ""
-    }
+    ${(channel.alt_names || []).join(" ")}
   `;
 
   return includesKeyword(
     text,
-    copticKeywords
+    blockedChannelKeywords
+  );
+}
+
+function isBlockedExternalChannel(
+  item
+) {
+  const text = `
+    ${item.name || ""}
+    ${item.group || ""}
+    ${item.tvgId || ""}
+    ${item.raw || ""}
+  `;
+
+  return includesKeyword(
+    text,
+    blockedChannelKeywords
   );
 }
 
@@ -434,6 +470,7 @@ function getChannelLanguages(
   /*
    * Channel languages
    */
+
   for (
     const language
     of channel.languages || []
@@ -448,6 +485,7 @@ function getChannelLanguages(
   /*
    * Feed languages
    */
+
   const channelStreams =
     streamsByChannel.get(
       channel.id
@@ -457,9 +495,7 @@ function getChannelLanguages(
     const stream
     of channelStreams
   ) {
-    if (
-      !stream.feed
-    ) {
+    if (!stream.feed) {
       continue;
     }
 
@@ -499,18 +535,13 @@ function isAllowedLanguage(
 
   /*
    * Missing language metadata:
-   * keep the channel.
+   * keep channel.
    */
-  if (
-    !languages.length
-  ) {
+
+  if (!languages.length) {
     return true;
   }
 
-  /*
-   * Accept if Arabic, English or Hindi
-   * is among the known languages.
-   */
   return languages.some(
     language =>
       allowedLanguages.has(
@@ -542,9 +573,6 @@ const quranKeywords = [
 
 /* -------------------------
  * Theater / Plays
- *
- * Kept as a classification in case IPTV-org or Free-TV
- * exposes a suitable channel in the future.
  * ------------------------- */
 
 const theaterKeywords = [
@@ -687,7 +715,7 @@ function getPlaylistCategory(
   /* -------------------------------------------------------
    * 1. Quran
    *
-   * Only Egypt + Saudi Arabia.
+   * Egypt + Saudi Arabia only
    * ------------------------------------------------------- */
 
   if (
@@ -896,6 +924,7 @@ function getPlaylistCategory(
     /*
      * Language fallback
      */
+
     const languages =
       getChannelLanguages(
         channel
@@ -926,14 +955,11 @@ function getPlaylistCategory(
 /* =========================================================
  * Stream scoring
  *
+ * Preference only.
+ *
  * IMPORTANT:
- *
- * This is preference scoring ONLY.
- *
- * NO codec is blocked.
- * NO stream is removed based on audio codec.
- *
- * ffprobe compatibility stays in check-streams.mjs.
+ * NO codec filtering.
+ * NO audio codec filtering.
  * ========================================================= */
 
 function scoreStream(
@@ -952,6 +978,7 @@ function scoreStream(
   /*
    * Obvious source warnings
    */
+
   if (
     text.includes(
       "offline"
@@ -971,6 +998,7 @@ function scoreStream(
   /*
    * Prefer HLS
    */
+
   if (
     stream.url
       ?.toLowerCase()
@@ -982,18 +1010,15 @@ function scoreStream(
   }
 
   /*
-   * Streams without special headers
-   * are easier for car players.
+   * Prefer streams without
+   * special headers.
    */
-  if (
-    !stream.referrer
-  ) {
+
+  if (!stream.referrer) {
     score += 15;
   }
 
-  if (
-    !stream.user_agent
-  ) {
+  if (!stream.user_agent) {
     score += 10;
   }
 
@@ -1002,9 +1027,8 @@ function scoreStream(
    *
    * Still NO hard filtering.
    */
-  if (
-    stream.quality
-  ) {
+
+  if (stream.quality) {
     const match =
       stream.quality.match(
         /(\d{3,4})p/i
@@ -1016,9 +1040,7 @@ function scoreStream(
           match[1]
         );
 
-      if (
-        quality === 720
-      ) {
+      if (quality === 720) {
         score += 40;
       }
 
@@ -1059,9 +1081,7 @@ function selectBestStream(
       channel.id
     ) || [];
 
-  if (
-    !available.length
-  ) {
+  if (!available.length) {
     return null;
   }
 
@@ -1084,7 +1104,6 @@ for (
   const channel
   of channels
 ) {
-
   /* -------------------------------------------------------
    * Allowed countries ONLY
    * ------------------------------------------------------- */
@@ -1097,10 +1116,25 @@ for (
     continue;
   }
 
-  /*
-   * Extra safety:
-   * country should also be in IPTV-org ARAB region.
-   */
+  /* -------------------------------------------------------
+   * Explicitly blocked channels
+   *
+   * Koogi is removed here.
+   * ------------------------------------------------------- */
+
+  if (
+    isBlockedChannel(
+      channel
+    )
+  ) {
+    continue;
+  }
+
+  /* -------------------------------------------------------
+   * Country must also belong to
+   * IPTV-org ARAB region
+   * ------------------------------------------------------- */
+
   if (
     !arabRegionCountries.has(
       channel.country
@@ -1146,8 +1180,7 @@ for (
   }
 
   const isEgypt =
-    channel.country ===
-    "EG";
+    channel.country === "EG";
 
   const isWantedCategory =
     channel.categories
@@ -1159,11 +1192,10 @@ for (
       );
 
   /*
-   * Egypt is intentionally broader.
-   *
-   * This allows general Egyptian TV/news
-   * channels into Egypt TV.
+   * Egypt intentionally includes
+   * general TV/news.
    */
+
   if (
     !isEgypt &&
     !isWantedCategory
@@ -1179,6 +1211,7 @@ for (
   /*
    * Egypt fallback
    */
+
   if (
     !category &&
     isEgypt
@@ -1187,9 +1220,7 @@ for (
       "Egypt TV";
   }
 
-  if (
-    !category
-  ) {
+  if (!category) {
     continue;
   }
 
@@ -1198,9 +1229,7 @@ for (
       channel
     );
 
-  if (
-    !stream
-  ) {
+  if (!stream) {
     continue;
   }
 
@@ -1214,15 +1243,13 @@ for (
 }
 
 /* =========================================================
- * M3U parser
+ * Generic M3U parser
  * ========================================================= */
 
 function parseM3U(text) {
   const lines =
     String(text || "")
-      .split(
-        /\r?\n/
-      );
+      .split(/\r?\n/);
 
   const result = [];
 
@@ -1247,6 +1274,7 @@ function parseM3U(text) {
     /*
      * Find next non-comment URL.
      */
+
     for (
       let j = i + 1;
       j < lines.length;
@@ -1315,26 +1343,21 @@ function parseM3U(text) {
         line,
 
       group:
-        groupMatch
-          ?.[1] || "",
+        groupMatch?.[1] || "",
 
       tvgId:
-        idMatch
-          ?.[1] || "",
+        idMatch?.[1] || "",
 
       logo:
-        logoMatch
-          ?.[1] || "",
+        logoMatch?.[1] || "",
 
       country:
-        countryMatch
-          ?.[1]
+        countryMatch?.[1]
           ?.toUpperCase() ||
         "",
 
       language:
-        languageMatch
-          ?.[1] || ""
+        languageMatch?.[1] || ""
     });
   }
 
@@ -1357,6 +1380,7 @@ function isAdultExternalChannel(
     ${item.name || ""}
     ${item.group || ""}
     ${item.tvgId || ""}
+    ${item.raw || ""}
   `;
 
   return includesKeyword(
@@ -1372,6 +1396,7 @@ function isCopticExternalChannel(
     ${item.name || ""}
     ${item.group || ""}
     ${item.tvgId || ""}
+    ${item.raw || ""}
   `;
 
   return includesKeyword(
@@ -1383,7 +1408,7 @@ function isCopticExternalChannel(
 /* =========================================================
  * Egypt enrichment from Free-TV
  *
- * Free-TV is currently used ONLY for Egypt.
+ * Free-TV is used ONLY for Egypt.
  * ========================================================= */
 
 const egyptWanted = [
@@ -1427,10 +1452,10 @@ const egyptWanted = [
   "family",
 
   /*
-   * Theater keywords remain here.
-   * If Free-TV adds such a channel in the future,
-   * it can be classified automatically.
+   * Theater keywords remain here
+   * for future legitimate channels.
    */
+
   "theater",
   "theatre",
   "plays",
@@ -1566,7 +1591,7 @@ function classifyEgyptChannel(
   }
 
   /* -------------------------------------------------------
-   * Foreign movies
+   * Foreign Movies
    * ------------------------------------------------------- */
 
   if (
@@ -1588,7 +1613,7 @@ function classifyEgyptChannel(
   }
 
   /* -------------------------------------------------------
-   * Arabic movies
+   * Arabic Movies
    * ------------------------------------------------------- */
 
   if (
@@ -1708,6 +1733,20 @@ for (
   const item
   of freeTvChannels
 ) {
+  /* -------------------------------------------------------
+   * Explicit blocked channels
+   *
+   * Koogi removed here too.
+   * ------------------------------------------------------- */
+
+  if (
+    isBlockedExternalChannel(
+      item
+    )
+  ) {
+    continue;
+  }
+
   const group =
     normalizeName(
       item.group
@@ -1716,21 +1755,21 @@ for (
   /*
    * Free-TV enrichment is Egypt only.
    */
+
   const isEgypt =
     group === "egypt" ||
     group.includes(
       "egypt"
     );
 
-  if (
-    !isEgypt
-  ) {
+  if (!isEgypt) {
     continue;
   }
 
   /*
-   * Egypt must be an allowed country.
+   * Egypt must still be allowed.
    */
+
   if (
     !allowedArabCountries.has(
       "EG"
@@ -1742,6 +1781,7 @@ for (
   /*
    * Adult
    */
+
   if (
     isAdultExternalChannel(
       item
@@ -1753,6 +1793,7 @@ for (
   /*
    * Coptic
    */
+
   if (
     isCopticExternalChannel(
       item
@@ -1762,8 +1803,9 @@ for (
   }
 
   /*
-   * Selected Egypt channels only
+   * Selected Egypt channels only.
    */
+
   if (
     !isWantedEgyptChannel(
       item.name
@@ -1773,8 +1815,9 @@ for (
   }
 
   /*
-   * Valid HTTP stream
+   * Valid HTTP stream.
    */
+
   if (
     !item.url ||
     !/^https?:\/\//i.test(
@@ -1795,8 +1838,9 @@ for (
     );
 
   /*
-   * Dedupe
+   * Dedupe.
    */
+
   if (
     existingNames.has(
       nameKey
@@ -1853,15 +1897,19 @@ for (
 
 /* =========================================================
  * Final safety filtering
+ *
+ * IMPORTANT:
+ * Everything passes through this filter before
+ * being written to arab-tv.m3u.
  * ========================================================= */
 
 const finalSelected =
   selected.filter(
     item => {
-
       /*
-       * Selected countries ONLY.
+       * Allowed countries
        */
+
       if (
         !allowedArabCountries.has(
           item.channel.country
@@ -1871,8 +1919,24 @@ const finalSelected =
       }
 
       /*
+       * Explicit blacklist
+       *
+       * Koogi is removed again here
+       * as a final safety check.
+       */
+
+      if (
+        isBlockedChannel(
+          item.channel
+        )
+      ) {
+        return false;
+      }
+
+      /*
        * Adult
        */
+
       if (
         isAdultChannel(
           item.channel
@@ -1883,7 +1947,10 @@ const finalSelected =
 
       /*
        * Coptic
+       *
+       * Final protection before writing M3U.
        */
+
       if (
         isCopticChannel(
           item.channel
@@ -1928,7 +1995,6 @@ const categoryOrder = {
 
 finalSelected.sort(
   (a, b) => {
-
     const countryA =
       countryName(
         a.channel.country
@@ -1942,9 +2008,9 @@ finalSelected.sort(
     /*
      * Country
      */
+
     if (
-      countryA !==
-      countryB
+      countryA !== countryB
     ) {
       return countryA.localeCompare(
         countryB
@@ -1954,6 +2020,7 @@ finalSelected.sort(
     /*
      * Category
      */
+
     const orderA =
       categoryOrder[
         a.category
@@ -1965,8 +2032,7 @@ finalSelected.sort(
       ] ?? 99;
 
     if (
-      orderA !==
-      orderB
+      orderA !== orderB
     ) {
       return (
         orderA -
@@ -1977,6 +2043,7 @@ finalSelected.sort(
     /*
      * Channel name
      */
+
     return String(
       a.channel.name || ""
     ).localeCompare(
@@ -1996,6 +2063,7 @@ const output = [];
 /*
  * EPG
  */
+
 output.push(
   '#EXTM3U x-tvg-url="https://raw.githubusercontent.com/StrangeDrVN/epg/public/output/guide.xml.gz"'
 );
@@ -2003,6 +2071,7 @@ output.push(
 /*
  * Generator info
  */
+
 output.push(
   "# Generated automatically from IPTV-org + Free-TV"
 );
@@ -2012,7 +2081,7 @@ output.push(
 );
 
 output.push(
-  "# Filters: Selected Arab countries + Arabic/English/Hindi + No Adult + No Coptic"
+  "# Filters: Selected Arab countries + Arabic/English/Hindi + No Adult + No Coptic + Koogi Blocked"
 );
 
 output.push(
@@ -2029,8 +2098,7 @@ output.push("");
  * Playlist entries
  * ========================================================= */
 
-let currentGroup =
-  null;
+let currentGroup = null;
 
 for (
   const item
@@ -2047,15 +2115,28 @@ for (
       channel.country
     );
 
+  /*
+   * IMPORTANT:
+   *
+   * This is what the application should read
+   * from group-title.
+   *
+   * Example:
+   *
+   * Egypt | Series
+   * Egypt | Arabic Movies
+   * Saudi Arabia | Quran
+   */
+
   const group =
     `${country} | ${category}`;
 
   /*
-   * Group header
+   * Visual group header
    */
+
   if (
-    group !==
-    currentGroup
+    group !== currentGroup
   ) {
     currentGroup =
       group;
@@ -2068,6 +2149,7 @@ for (
   /*
    * Logo
    */
+
   const logo =
     item.logo ||
     logoMap.get(
@@ -2078,6 +2160,7 @@ for (
   /*
    * Channel name
    */
+
   const name =
     String(
       channel.name ||
@@ -2122,6 +2205,7 @@ for (
   /*
    * EXTINF attributes
    */
+
   const attributes = [
     `tvg-id="${safeId}"`,
 
@@ -2130,6 +2214,10 @@ for (
     safeLogo
       ? `tvg-logo="${safeLogo}"`
       : "",
+
+    /*
+     * This is the actual M3U category.
+     */
 
     `group-title="${safeGroup}"`
   ]
@@ -2169,6 +2257,7 @@ await fs.writeFile(
  * ========================================================= */
 
 console.log("");
+
 console.log(
   "================================="
 );
@@ -2205,6 +2294,7 @@ for (
 }
 
 console.log("");
+
 console.log(
   "Countries"
 );
@@ -2241,6 +2331,7 @@ for (
 }
 
 console.log("");
+
 console.log(
   "Categories"
 );
@@ -2276,6 +2367,7 @@ for (
 }
 
 console.log("");
+
 console.log(
   "Sources"
 );
@@ -2293,6 +2385,7 @@ console.table(
  * ========================================================= */
 
 console.log("");
+
 console.log(
   "================================="
 );
@@ -2371,6 +2464,10 @@ console.log(
 
 console.log(
   "✅ Coptic channels blocked"
+);
+
+console.log(
+  "✅ Koogi blocked"
 );
 
 console.log(

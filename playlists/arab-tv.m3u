@@ -1,15 +1,9 @@
 #EXTM3U x-tvg-url="https://raw.githubusercontent.com/StrangeDrVN/epg/public/output/guide.xml.gz"
-# Generated automatically from IPTV-org + Free-TV + Arabic Extra
-# Filters: Arab countries + Arabic/English primary + No Adult + No Coptic
-# Generated: 2026-09-08T06:46:01.056Z
-
-# === Algeria | Kids ===
-#EXTINF:-1 tvg-id="AmouYazidTV.dz" tvg-name="Amou Yazid TV" tvg-logo="https://i.imgur.com/L8UPGPC.png" group-title="Algeria | Kids",Amou Yazid TV
-http://mkstream.servehttp.com:1940/AmouYazid/ay1/playlist.m3u8
-
-# === Algeria | Sports ===
-#EXTINF:-1 tvg-id="ElHeddafTV.dz" tvg-name="El-Heddaf TV" tvg-logo="https://i.imgur.com/cDkIDIA.png" group-title="Algeria | Sports",El-Heddaf TV
-https://live.elheddaftv.com:8081/elheddaftv/index.m3u8
+# Generated automatically from IPTV-org + Free-TV
+# Countries: BH, EG, JO, KW, PS, QA, SA, SY, TN, AE
+# Filters: Selected Arab countries + Arabic/English/Hindi + No Adult + No Coptic
+# Playback: No codec-based channel filtering
+# Generated: 2026-09-08T07:07:47.635Z
 
 # === Bahrain | Sports ===
 #EXTINF:-1 tvg-id="BahrainSports1.bh" tvg-name="Bahrain Sports 1" tvg-logo="https://i.imgur.com/fBpLsbC.png" group-title="Bahrain | Sports",Bahrain Sports 1
@@ -77,10 +71,6 @@ https://nogoumtv.nrpstream.com/hls/stream.m3u8
 #EXTINF:-1 tvg-id="WatanTV.eg" tvg-name="Watan TV" tvg-logo="https://i.imgur.com/pZyKaUH.png" group-title="Egypt | Egypt TV",Watan TV
 https://rp.tactivemedia.com/watantv_source/live/playlist.m3u8
 
-# === Iraq | Sports ===
-#EXTINF:-1 tvg-id="AlIraqiaSport.iq" tvg-name="Al Iraqia Sport" tvg-logo="https://i.imgur.com/DrrlxTO.png" group-title="Iraq | Sports",Al Iraqia Sport
-https://imn-live.esite-lab.com/hls/iraqia-sports-1.m3u8
-
 # === Jordan | Comedy ===
 #EXTINF:-1 tvg-id="JordanComedy.jo" tvg-name="Jordan Comedy" tvg-logo="https://i.imgur.com/DuwwoO2.png" group-title="Jordan | Comedy",Jordan Comedy
 https://playlist.fasttvcdn.com/pl/cc0blorawy1ibohhrupraa/Comedy/playlist.m3u8
@@ -95,18 +85,6 @@ https://kwtspta.cdn.mangomolo.com/sp/smil:sp.stream.smil/chunklist.m3u8
 
 #EXTINF:-1 tvg-id="KTVSportPlus.kw" tvg-name="KTV Sport Plus" tvg-logo="https://i.imgur.com/l4oX0gf.png" group-title="Kuwait | Sports",KTV Sport Plus
 https://kwtsplta.cdn.mangomolo.com/spl/smil:spl.stream.smil/chunklist.m3u8
-
-# === Lebanon | Kids ===
-#EXTINF:-1 tvg-id="TahaTV.lb" tvg-name="Taha TV" tvg-logo="https://i.imgur.com/hdsrxvX.png" group-title="Lebanon | Kids",Taha TV
-https://stream.starmenajo.com/hls/app/live/ts:fhd.m3u8
-
-# === Morocco | Sports ===
-#EXTINF:-1 tvg-id="Arryadia.ma" tvg-name="Arryadia" tvg-logo="https://i.imgur.com/XjzK3gZ.png" group-title="Morocco | Sports",Arryadia
-http://149.100.11.252:8000/play/a065/index.m3u8
-
-# === Oman | Sports ===
-#EXTINF:-1 tvg-id="OmanSportsTV.om" tvg-name="Oman Sports TV" tvg-logo="https://i.imgur.com/1omi7p8.png" group-title="Oman | Sports",Oman Sports TV
-https://partneta.cdn.mgmlcdn.com/omsport/smil:omsport.stream.smil/chunklist.m3u8
 
 # === Qatar | Sports ===
 #EXTINF:-1 tvg-id="AlkassFour.qa" tvg-name="Alkass Four" tvg-logo="https://i.imgur.com/iDL65Wu.png" group-title="Qatar | Sports",Alkass Four

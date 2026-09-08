@@ -1,1 +1,142 @@
-
+{
+  "version": 1,
+  "type": "theater-vod",
+  "generatedAt": "2026-09-08T07:18:38.795Z",
+  "playbackPolicy": {
+    "description": "Use provider-supported playback only.",
+    "directStreamExtraction": false,
+    "allowExternalProvider": true,
+    "allowYouTubeEmbed": true
+  },
+  "countries": {
+    "BH": "Bahrain",
+    "EG": "Egypt",
+    "JO": "Jordan",
+    "KW": "Kuwait",
+    "PS": "Palestine",
+    "QA": "Qatar",
+    "SA": "Saudi Arabia",
+    "SY": "Syria",
+    "TN": "Tunisia",
+    "AE": "United Arab Emirates"
+  },
+  "providers": {
+    "youtube": {
+      "id": "youtube",
+      "name": "YouTube",
+      "playbackType": "external",
+      "supportsEmbed": true
+    },
+    "shahid": {
+      "id": "shahid",
+      "name": "Shahid",
+      "playbackType": "external",
+      "supportsEmbed": false
+    }
+  },
+  "categories": [
+    {
+      "id": "egyptian-plays",
+      "titleAr": "مسرحيات مصرية",
+      "titleEn": "Egyptian Plays"
+    },
+    {
+      "id": "arabic-plays",
+      "titleAr": "مسرحيات عربية",
+      "titleEn": "Arabic Plays"
+    },
+    {
+      "id": "masrah-masr",
+      "titleAr": "مسرح مصر",
+      "titleEn": "Masrah Masr"
+    }
+  ],
+  "count": 4,
+  "items": [
+    {
+      "id": "masrah-masr-season-3",
+      "titleAr": "مسرح مصر - الموسم الثالث كامل",
+      "titleEn": "Masrah Masr - Season 3 Full",
+      "descriptionAr": "الموسم الثالث كامل ويحتوي على مجموعة كبيرة من المسرحيات.",
+      "descriptionEn": "Full Masrah Masr season 3 collection.",
+      "type": "collection",
+      "category": "Theater",
+      "subcategory": "Egyptian Plays",
+      "country": "EG",
+      "language": [
+        "ar"
+      ],
+      "provider": "youtube",
+      "youtubeVideoId": "kOikhCWCJd0",
+      "providerUrl": "https://www.youtube.com/watch?v=kOikhCWCJd0",
+      "embedUrl": "https://www.youtube.com/embed/kOikhCWCJd0",
+      "thumbnail": "https://i.ytimg.com/vi/kOikhCWCJd0/hqdefault.jpg",
+      "year": 2025,
+      "featured": true,
+      "playableInsideApp": true
+    },
+    {
+      "id": "shahid-plays",
+      "titleAr": "مسرحيات على شاهد",
+      "titleEn": "Shahid Plays",
+      "descriptionAr": "قسم المسرحيات الرسمي على منصة شاهد.",
+      "descriptionEn": "Official Shahid plays catalog.",
+      "type": "catalog",
+      "category": "Theater",
+      "country": "SA",
+      "language": [
+        "ar"
+      ],
+      "provider": "shahid",
+      "providerUrl": "https://shahid.mbc.net/ar/plays",
+      "thumbnail": null,
+      "year": null,
+      "featured": true,
+      "playableInsideApp": false
+    },
+    {
+      "id": "masrah-masr-social-media",
+      "titleAr": "مسرحية تواصل إجتماعي",
+      "titleEn": "Social Media - Masrah Masr",
+      "descriptionAr": "مسرحية من الموسم الأول من مسرح مصر.",
+      "descriptionEn": "Masrah Masr Season 1 theater performance.",
+      "type": "video",
+      "category": "Theater",
+      "subcategory": "Egyptian Plays",
+      "country": "EG",
+      "language": [
+        "ar"
+      ],
+      "provider": "youtube",
+      "youtubeVideoId": "A13oawDTK1c",
+      "providerUrl": "https://www.youtube.com/watch?v=A13oawDTK1c",
+      "embedUrl": "https://www.youtube.com/embed/A13oawDTK1c",
+      "thumbnail": "https://i.ytimg.com/vi/A13oawDTK1c/hqdefault.jpg",
+      "year": 2024,
+      "featured": true,
+      "playableInsideApp": true
+    },
+    {
+      "id": "masrah-masr-al-moalef",
+      "titleAr": "مسرحية المؤلف",
+      "titleEn": "Al Moalef - Masrah Masr",
+      "descriptionAr": "مسرحية من الموسم الثالث من مسرح مصر.",
+      "descriptionEn": "Masrah Masr Season 3 theater performance.",
+      "type": "video",
+      "category": "Theater",
+      "subcategory": "Egyptian Plays",
+      "country": "EG",
+      "language": [
+        "ar"
+      ],
+      "provider": "youtube",
+      "youtubeVideoId": "kINc-OuhUJk",
+      "providerUrl": "https://www.youtube.com/watch?v=kINc-OuhUJk",
+      "embedUrl": "https://www.youtube.com/embed/kINc-OuhUJk",
+      "thumbnail": "https://i.ytimg.com/vi/kINc-OuhUJk/hqdefault.jpg",
+      "year": 2024,
+      "featured": false,
+      "playableInsideApp": true
+    }
+  ]
+}

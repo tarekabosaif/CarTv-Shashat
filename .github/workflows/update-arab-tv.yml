@@ -28,8 +28,11 @@ jobs:
             sudo apt-get install -y ffmpeg
           fi
 
-      - name: Generate playlist
+      - name: Generate live playlist
         run: node .github/scripts/generate-arab-tv.mjs
+
+      - name: Generate Theater VOD catalog
+        run: node .github/scripts/generate-theater-vod.mjs
 
       - name: Check stream codecs
         run: node .github/scripts/check-streams.mjs

@@ -1,9 +1,9 @@
 #EXTM3U x-tvg-url="https://raw.githubusercontent.com/StrangeDrVN/epg/public/output/guide.xml.gz"
 # Generated automatically from IPTV-org + Free-TV
 # Countries: BH, EG, JO, KW, PS, QA, SA, SY, TN, AE
-# Filters: Selected Arab countries + Arabic/English/Hindi + No Adult + No Coptic
+# Filters: Selected Arab countries + Arabic/English/Hindi + No Adult + No Coptic + Koogi Blocked
 # Playback: No codec-based channel filtering
-# Generated: 2026-09-08T07:18:38.692Z
+# Generated: 2026-09-08T07:57:27.170Z
 
 # === Bahrain | Sports ===
 #EXTINF:-1 tvg-id="BahrainSports1.bh" tvg-name="Bahrain Sports 1" tvg-logo="https://i.imgur.com/fBpLsbC.png" group-title="Bahrain | Sports",Bahrain Sports 1
@@ -11,10 +11,6 @@ https://5c7b683162943.streamlock.net/live/ngrp:sportsone_all/playlist.m3u8
 
 #EXTINF:-1 tvg-id="BahrainSports2.bh" tvg-name="Bahrain Sports 2" tvg-logo="https://i.imgur.com/ZkuZmIo.png" group-title="Bahrain | Sports",Bahrain Sports 2
 https://5c7b683162943.streamlock.net/live/ngrp:bahrainsportstwo_all/playlist.m3u8
-
-# === Egypt | Kids ===
-#EXTINF:-1 tvg-id="KoogiTV.eg" tvg-name="Koogi TV" tvg-logo="https://i.imgur.com/zojMTP9.png" group-title="Egypt | Kids",Koogi TV
-https://5d658d7e9f562.streamlock.net/koogi.tv/koogi.smil/playlist.m3u8
 
 # === Egypt | Series ===
 #EXTINF:-1 tvg-id="CBCDrama.eg" tvg-name="CBC Drama" tvg-logo="https://i.imgur.com/I8YdakH.png" group-title="Egypt | Series",CBC Drama

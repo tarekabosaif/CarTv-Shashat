@@ -4,7 +4,7 @@
 # Filters: Selected Arab countries + Arabic/English/Hindi + No Adult + No Coptic + Koogi Blocked
 # Egypt discovery: ON / OnTime Sports / Al Nahar / DMC / Sada El Balad
 # Playback: No codec-based channel filtering
-# Generated: 2026-09-19T19:37:45.644Z
+# Generated: 2026-09-20T01:45:13.042Z
 
 # === Bahrain | Sports ===
 #EXTINF:-1 tvg-id="BahrainSports1.bh" tvg-name="Bahrain Sports 1" tvg-logo="https://i.imgur.com/fBpLsbC.png" group-title="Bahrain | Sports",Bahrain Sports 1
@@ -12,10 +12,6 @@ https://5c7b683162943.streamlock.net/live/ngrp:sportsone_all/playlist.m3u8
 
 #EXTINF:-1 tvg-id="BahrainSports2.bh" tvg-name="Bahrain Sports 2" tvg-logo="https://i.imgur.com/ZkuZmIo.png" group-title="Bahrain | Sports",Bahrain Sports 2
 https://5c7b683162943.streamlock.net/live/ngrp:bahrainsportstwo_all/playlist.m3u8
-
-# === Egypt | Series ===
-#EXTINF:-1 tvg-id="CBCDrama.eg" tvg-name="CBC Drama" tvg-logo="https://i.imgur.com/I8YdakH.png" group-title="Egypt | Series",CBC Drama
-https://flu.systemnet.tv/CBCDrama/index.m3u8
 
 # === Egypt | Arabic Movies ===
 #EXTINF:-1 tvg-id="RotanaCinemaEgypt.eg" tvg-name="Rotana Cinema Egypt" tvg-logo="https://i.imgur.com/dGlKoLW.png" group-title="Egypt | Arabic Movies",Rotana Cinema Egypt
@@ -37,12 +33,6 @@ https://bcovlive-a.akamaihd.net/d30cbb3350af4cb7a6e05b9eb1bfd850/eu-west-1/60579
 
 #EXTINF:-1 tvg-id="AlhayatTV.eg" tvg-name="Alhayat TV" tvg-logo="https://upload.wikimedia.org/wikipedia/commons/8/8c/Al-Hayat_Media_Center_Logo_%28variant_2%29.svg" group-title="Egypt | Egypt TV",Alhayat TV
 https://cdn3.wowza.com/5/OE5HREpIcEkySlNT/alhayat-live/ngrp:livestream_all/playlist.m3u8
-
-#EXTINF:-1 tvg-id="CBC.eg" tvg-name="CBC" tvg-logo="https://i.imgur.com/8apNaLP.png" group-title="Egypt | Egypt TV",CBC
-https://flu.systemnet.tv/CBC/index.m3u8
-
-#EXTINF:-1 tvg-id="CBCSofra.eg" tvg-name="CBC Sofra" tvg-logo="https://i.imgur.com/YAdk2WR.png" group-title="Egypt | Egypt TV",CBC Sofra
-https://flu.systemnet.tv/CBCSofra/index.m3u8
 
 #EXTINF:-1 tvg-id="ElRadio9090FM.eg" tvg-name="El Radio 9090 FM" tvg-logo="https://www.9090.fm/images/logo.png" group-title="Egypt | Egypt TV",El Radio 9090 FM
 https://9090video.mobtada.com/hls/stream.m3u8
@@ -84,26 +74,8 @@ https://kwtspta.cdn.mangomolo.com/sp/smil:sp.stream.smil/chunklist.m3u8
 https://kwtsplta.cdn.mangomolo.com/spl/smil:spl.stream.smil/chunklist.m3u8
 
 # === Qatar | Sports ===
-#EXTINF:-1 tvg-id="AlkassFour.qa" tvg-name="Alkass Four" tvg-logo="https://i.imgur.com/iDL65Wu.png" group-title="Qatar | Sports",Alkass Four
-https://liveeu-gcp.alkassdigital.net/alkass4-p/main.m3u8
-
-#EXTINF:-1 tvg-id="AlkassOne.qa" tvg-name="Alkass One" tvg-logo="https://i.imgur.com/10mmlha.png" group-title="Qatar | Sports",Alkass One
-https://liveeu-gcp.alkassdigital.net/alkass1-p/main.m3u8
-
-#EXTINF:-1 tvg-id="AlkassSHOOF.qa" tvg-name="Alkass SHOOF" tvg-logo="https://shoof.alkass.net/assets/images/shoof.png" group-title="Qatar | Sports",Alkass SHOOF
-https://liveeu-gcp.alkassdigital.net/shooflive/main.m3u8
-
-#EXTINF:-1 tvg-id="AlkassSHOOF2.qa" tvg-name="Alkass SHOOF 2" tvg-logo="https://shoof.alkass.net/assets/images/shoof2.png" group-title="Qatar | Sports",Alkass SHOOF 2
-https://liveeu-gcp.alkassdigital.net/shooflive2/main.m3u8
-
-#EXTINF:-1 tvg-id="AlkassSix.qa" tvg-name="Alkass Six" tvg-logo="https://i.imgur.com/CrPSPSC.png" group-title="Qatar | Sports",Alkass Six
-https://liveeu-gcp.alkassdigital.net/alkass6-p/main.m3u8
-
 #EXTINF:-1 tvg-id="AlkassThree.qa" tvg-name="Alkass Three" tvg-logo="https://i.imgur.com/d57BdFh.png" group-title="Qatar | Sports",Alkass Three
 https://streamer2.qna.org.qa/148161470_live/148161470_296.sdp/playlist.m3u8
-
-#EXTINF:-1 tvg-id="AlkassTwo.qa" tvg-name="Alkass Two" tvg-logo="https://i.imgur.com/8w61kFX.png" group-title="Qatar | Sports",Alkass Two
-https://liveeu-gcp.alkassdigital.net/alkass2-p/main.m3u8
 
 # === Saudi Arabia | Quran ===
 #EXTINF:-1 tvg-id="AlQuranAlKareemTV.sa" tvg-name="Al Quran Al Kareem TV" tvg-logo="https://aloula.faulio.com/storage/mediagallery/da/6c/fullhd_7eaf7e165c4cad5b3a45eff65d2011e18be5d670.png" group-title="Saudi Arabia | Quran",Al Quran Al Kareem TV

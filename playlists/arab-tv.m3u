@@ -4,7 +4,7 @@
 # Filters: Selected Arab countries + Arabic/English/Hindi + No Adult + No Coptic + Koogi Blocked
 # Egypt discovery: ON / OnTime Sports / Al Nahar / DMC / Sada El Balad
 # Playback: No codec-based channel filtering
-# Generated: 2026-09-26T20:14:04.434Z
+# Generated: 2026-09-27T01:56:43.761Z
 
 # === Bahrain | Sports ===
 #EXTINF:-1 tvg-id="BahrainSports1.bh" tvg-name="Bahrain Sports 1" tvg-logo="https://i.imgur.com/fBpLsbC.png" group-title="Bahrain | Sports",Bahrain Sports 1
@@ -72,10 +72,6 @@ https://kwtspta.cdn.mangomolo.com/sp/smil:sp.stream.smil/chunklist.m3u8
 
 #EXTINF:-1 tvg-id="KTVSportPlus.kw" tvg-name="KTV Sport Plus" tvg-logo="https://i.imgur.com/l4oX0gf.png" group-title="Kuwait | Sports",KTV Sport Plus
 https://kwtsplta.cdn.mangomolo.com/spl/smil:spl.stream.smil/chunklist.m3u8
-
-# === Qatar | Sports ===
-#EXTINF:-1 tvg-id="AlkassThree.qa" tvg-name="Alkass Three" tvg-logo="https://i.imgur.com/d57BdFh.png" group-title="Qatar | Sports",Alkass Three
-https://streamer2.qna.org.qa/148161470_live/148161470_296.sdp/playlist.m3u8
 
 # === Saudi Arabia | Quran ===
 #EXTINF:-1 tvg-id="AlQuranAlKareemTV.sa" tvg-name="Al Quran Al Kareem TV" tvg-logo="https://aloula.faulio.com/storage/mediagallery/da/6c/fullhd_7eaf7e165c4cad5b3a45eff65d2011e18be5d670.png" group-title="Saudi Arabia | Quran",Al Quran Al Kareem TV

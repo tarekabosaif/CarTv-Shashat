@@ -4,7 +4,7 @@
 # Filters: Selected Arab countries + Arabic/English/Hindi + No Adult + No Coptic + Koogi Blocked
 # Egypt discovery: ON / OnTime Sports / Al Nahar / DMC / Sada El Balad
 # Playback: No codec-based channel filtering
-# Generated: 2026-10-01T22:02:07.915Z
+# Generated: 2026-10-02T02:38:11.528Z
 
 # === Bahrain | Sports ===
 #EXTINF:-1 tvg-id="BahrainSports1.bh" tvg-name="Bahrain Sports 1" tvg-logo="https://i.imgur.com/fBpLsbC.png" group-title="Bahrain | Sports",Bahrain Sports 1
@@ -12,6 +12,10 @@ https://5c7b683162943.streamlock.net/live/ngrp:sportsone_all/playlist.m3u8
 
 #EXTINF:-1 tvg-id="BahrainSports2.bh" tvg-name="Bahrain Sports 2" tvg-logo="https://i.imgur.com/ZkuZmIo.png" group-title="Bahrain | Sports",Bahrain Sports 2
 https://5c7b683162943.streamlock.net/live/ngrp:bahrainsportstwo_all/playlist.m3u8
+
+# === Egypt | Series ===
+#EXTINF:-1 tvg-id="NileDrama.eg" tvg-name="Nile Drama" tvg-logo="https://i.imgur.com/FasJFMM.png" group-title="Egypt | Series",Nile Drama
+http://185.9.2.18/chid_352/index.m3u8
 
 # === Egypt | Arabic Movies ===
 #EXTINF:-1 tvg-id="RotanaCinemaEgypt.eg" tvg-name="Rotana Cinema Egypt" tvg-logo="https://i.imgur.com/dGlKoLW.png" group-title="Egypt | Arabic Movies",Rotana Cinema Egypt
@@ -127,7 +131,7 @@ https://shd-gcp-live.edgenextcdn.net/live/bitmovin-al-souriya-tv/e3150760fa5fd62
 
 # === Syria | Sports ===
 #EXTINF:-1 tvg-id="Prime.sy" tvg-name="Prime" tvg-logo="https://prime1tv.com/wp-content/uploads/2025/12/7-1.png" group-title="Syria | Sports",Prime
-https://mn-nl.mncdn.com/primetv/live/index.m3u8
+https://cdn.bestream.io/prime/prime.m3u8
 
 # === United Arab Emirates | Kids ===
 #EXTINF:-1 tvg-id="SpacetoonArabic.ae" tvg-name="Spacetoon Arabic" tvg-logo="https://upload.wikimedia.org/wikipedia/en/2/2b/Spacetoon_logo.png" group-title="United Arab Emirates | Kids",Spacetoon Arabic

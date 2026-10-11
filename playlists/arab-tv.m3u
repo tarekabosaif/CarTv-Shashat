@@ -1,10 +1,10 @@
 #EXTM3U x-tvg-url="https://raw.githubusercontent.com/StrangeDrVN/epg/public/output/guide.xml.gz"
-# Generated automatically from IPTV-org + Free-TV + validated Egypt fallback
-# Countries: BH, EG, JO, KW, PS, QA, SA, SY, TN, AE
-# Filters: Selected Arab countries + Arabic/English/Hindi + No Adult + No Coptic + Koogi Blocked
-# Egypt discovery: ON / OnTime Sports / Al Nahar / DMC / Sada El Balad
-# Playback: No codec-based channel filtering
-# Generated: 2026-10-11T02:18:30.387Z
+# Generated from IPTV-org + Free-TV + validated fallback
+# Countries: BH, EG, JO, KW, PS, QA, SA, SY, TN, AE + International
+# Categories: Quran, Kids, Family, Comedy, Theater, Series, Arabic Movies, Foreign Movies, Sports, Egypt TV
+# beIN SPORTS XTRA: validated candidate only
+# No codec-based filtering
+# Generated: 2026-10-11T06:18:47.992Z
 
 # === Bahrain | Sports ===
 #EXTINF:-1 tvg-id="BahrainSports1.bh" tvg-name="Bahrain Sports 1" tvg-logo="https://i.imgur.com/fBpLsbC.png" group-title="Bahrain | Sports",Bahrain Sports 1
@@ -62,6 +62,10 @@ https://nogoumtv.nrpstream.com/hls/stream.m3u8
 #EXTINF:-1 tvg-id="WatanTV.eg" tvg-name="Watan TV" tvg-logo="https://i.imgur.com/pZyKaUH.png" group-title="Egypt | Egypt TV",Watan TV
 https://rp.tactivemedia.com/watantv_source/live/playlist.m3u8
 
+# === International | Sports ===
+#EXTINF:-1 tvg-id="beINSportsXTRA.int" tvg-name="beIN SPORTS XTRA" group-title="International | Sports",beIN SPORTS XTRA
+https://bein-xtra-bein.amagi.tv/playlist.m3u8
+
 # === Jordan | Comedy ===
 #EXTINF:-1 tvg-id="JordanComedy.jo" tvg-name="Jordan Comedy" tvg-logo="https://i.imgur.com/DuwwoO2.png" group-title="Jordan | Comedy",Jordan Comedy
 https://playlist.fasttvcdn.com/pl/cc0blorawy1ibohhrupraa/Comedy/playlist.m3u8
@@ -115,6 +119,9 @@ https://rotana.hibridcdn.net/rotananet/drama_net-7Y83PP5adWixDF93/playlist.m3u8
 #EXTINF:-1 tvg-id="Aflam.sa" tvg-name="Aflam" tvg-logo="https://i.imgur.com/cTLj7Yt.png" group-title="Saudi Arabia | Arabic Movies",Aflam
 https://shd-amg-fast.edgenextcdn.net/tx001/playlist.m3u8
 
+#EXTINF:-1 tvg-id="IqraaArabic.sa" tvg-name="Iqraa Arabic" tvg-logo="https://i.imgur.com/HPVsIa4.png" group-title="Saudi Arabia | Arabic Movies",Iqraa Arabic
+https://playlist.fasttvcdn.com/pl/dlkqw1ftuvuuzkcb4pxdcg/Iqraafasttv3/playlist.m3u8
+
 #EXTINF:-1 tvg-id="RotanaCinemaKSA.sa" tvg-name="Rotana Cinema KSA" tvg-logo="https://i.imgur.com/pGgp38I.png" group-title="Saudi Arabia | Arabic Movies",Rotana Cinema KSA
 https://rotana.hibridcdn.net/rotananet/cinema_net-7Y83PP5adWixDF93/playlist.m3u8
 
@@ -151,6 +158,9 @@ https://shd-gcp-live.edgenextcdn.net/live/bitmovin-mbc-bollywood/546eb40d7dcf9a2
 
 #EXTINF:-1 tvg-id="OSNMoviesAction.ae" tvg-name="OSN Movies Action" tvg-logo="https://i.imgur.com/uOzyKup.png" group-title="United Arab Emirates | Foreign Movies",OSN Movies Action
 http://116.90.120.151:8000/play/a0ax/index.m3u8
+
+#EXTINF:-1 tvg-id="PeaceTVEnglish.ae" tvg-name="Peace TV English" tvg-logo="https://i.imgur.com/rjgCM2B.png" group-title="United Arab Emirates | Foreign Movies",Peace TV English
+https://dzkyvlfyge.erbvr.com/PeaceTvEnglish/index.m3u8
 
 # === United Arab Emirates | Sports ===
 #EXTINF:-1 tvg-id="SharjahSports.ae" tvg-name="Sharjah Sports" tvg-logo="https://i.imgur.com/CsEElsJ.png" group-title="United Arab Emirates | Sports",Sharjah Sports

@@ -1,195 +1,14 @@
+
 import fs from "node:fs/promises";
 
-/* =========================================================
- * Sources
- * ========================================================= */
-
-const API =
-  "https://iptv-org.github.io/api";
-
+const API = "https://iptv-org.github.io/api";
 const FREE_TV_URL =
   "https://raw.githubusercontent.com/Free-TV/IPTV/master/playlist.m3u8";
 
-/* =========================================================
- * Fetch helpers
- * ========================================================= */
+const EPG_URL =
+  "https://raw.githubusercontent.com/StrangeDrVN/epg/public/output/guide.xml.gz";
 
-async function fetchJson(url) {
-  const response =
-    await fetch(url);
-
-  if (!response.ok) {
-    throw new Error(
-      `Failed to fetch ${url}: ${response.status}`
-    );
-  }
-
-  return response.json();
-}
-
-async function fetchText(url) {
-  const response =
-    await fetch(url);
-
-  if (!response.ok) {
-    throw new Error(
-      `Failed to fetch ${url}: ${response.status}`
-    );
-  }
-
-  return response.text();
-}
-
-/* =========================================================
- * Optional HLS validation
- *
- * Used ONLY for curated Egypt fallback channels.
- * ========================================================= */
-
-async function isValidHls(
-  url,
-  timeoutMs = 12000
-) {
-  const controller =
-    new AbortController();
-
-  const timeout =
-    setTimeout(
-      () => controller.abort(),
-      timeoutMs
-    );
-
-  try {
-    const response =
-      await fetch(
-        url,
-        {
-          signal:
-            controller.signal,
-
-          redirect:
-            "follow",
-
-          headers: {
-            "User-Agent":
-              "Mozilla/5.0 CarTV/1.0",
-
-            Accept:
-              "application/vnd.apple.mpegurl,application/x-mpegURL,text/plain,*/*"
-          }
-        }
-      );
-
-    if (!response.ok) {
-      return false;
-    }
-
-    const text =
-      await response.text();
-
-    return text
-      .trimStart()
-      .startsWith(
-        "#EXTM3U"
-      );
-  }
-  catch {
-    return false;
-  }
-  finally {
-    clearTimeout(
-      timeout
-    );
-  }
-}
-
-/* =========================================================
- * Load sources
- * ========================================================= */
-
-console.log(
-  "Loading IPTV-org + Free-TV..."
-);
-
-const [
-  channels,
-  streams,
-  feeds,
-  regions,
-  logos,
-  freeTvText
-] = await Promise.all([
-  fetchJson(
-    `${API}/channels.json`
-  ),
-
-  fetchJson(
-    `${API}/streams.json`
-  ),
-
-  fetchJson(
-    `${API}/feeds.json`
-  ),
-
-  fetchJson(
-    `${API}/regions.json`
-  ),
-
-  fetchJson(
-    `${API}/logos.json`
-  ),
-
-  fetchText(
-    FREE_TV_URL
-  )
-]);
-
-console.log(
-  "✅ Sources loaded."
-);
-
-/* =========================================================
- * Helpers
- * ========================================================= */
-
-function normalizeName(name) {
-  return String(
-    name || ""
-  )
-    .toLowerCase()
-    .replace(
-      /[^\p{L}\p{N}]+/gu,
-      " "
-    )
-    .replace(
-      /\s+/g,
-      " "
-    )
-    .trim();
-}
-
-function includesKeyword(
-  text,
-  keywords
-) {
-  const normalized =
-    normalizeName(
-      text
-    );
-
-  return keywords.some(
-    keyword =>
-      normalized.includes(
-        normalizeName(
-          keyword
-        )
-      )
-  );
-}
-
-/* =========================================================
- * Allowed countries
- * ========================================================= */
+const OUTPUT_FILE = "playlists/arab-tv.m3u";
 
 const countryNames = {
   BH: "Bahrain",
@@ -204,2649 +23,822 @@ const countryNames = {
   AE: "United Arab Emirates"
 };
 
-const allowedArabCountries =
-  new Set(
-    Object.keys(
-      countryNames
-    )
-  );
+const allowedCountries = new Set(Object.keys(countryNames));
 
-function countryName(code) {
-  return (
-    countryNames[
-      code
-    ] ||
-    code
-  );
-}
+const allowedLanguages = new Set([
+  "ar", "ara", "arb", "arabic",
+  "en", "eng", "english",
+  "hi", "hin", "hindi"
+]);
 
-/* =========================================================
- * ARAB region
- * ========================================================= */
+const sourceCategories = new Set([
+  "kids", "movies", "series", "sports",
+  "religious", "comedy", "family",
+  "entertainment", "culture"
+]);
 
-const arabRegion =
-  regions.find(
-    region =>
-      region.code
-        ?.toUpperCase() ===
-      "ARAB"
-  );
-
-if (!arabRegion) {
-  throw new Error(
-    "ARAB region was not found."
-  );
-}
-
-const arabRegionCountries =
-  new Set(
-    arabRegion.countries || []
-  );
-
-/* =========================================================
- * Allowed languages
- * ========================================================= */
-
-const allowedLanguages =
-  new Set([
-    "ar",
-    "ara",
-    "arb",
-    "arabic",
-
-    "en",
-    "eng",
-    "english",
-
-    /*
-     * Keep Hindi for:
-     * MBC Bollywood
-     * Zee Alwan
-     */
-    "hi",
-    "hin",
-    "hindi"
-  ]);
-
-function normalizeLanguage(
-  language
-) {
-  return String(
-    language || ""
-  )
-    .trim()
-    .toLowerCase();
-}
-
-/* =========================================================
- * Source categories
- * ========================================================= */
-
-const sourceCategories =
-  new Set([
-    "series",
-    "sports",
-    "kids",
-    "movies",
-    "religious",
-    "comedy",
-    "family",
-    "entertainment",
-    "culture"
-  ]);
-
-/* =========================================================
- * Feed lookup
- * ========================================================= */
-
-const feedMap =
-  new Map(
-    feeds.map(
-      feed => [
-        `${feed.channel}@${feed.id}`,
-        feed
-      ]
-    )
-  );
-
-/* =========================================================
- * Logo lookup
- * ========================================================= */
-
-const logoMap =
-  new Map();
-
-for (
-  const logo
-  of logos
-) {
-  if (!logo.in_use) {
-    continue;
-  }
-
-  if (
-    !logoMap.has(
-      logo.channel
-    )
-  ) {
-    logoMap.set(
-      logo.channel,
-      logo.url
-    );
-  }
-}
-
-/* =========================================================
- * Streams lookup
- * ========================================================= */
-
-const streamsByChannel =
-  new Map();
-
-for (
-  const stream
-  of streams
-) {
-  if (
-    !stream.channel ||
-    !stream.url
-  ) {
-    continue;
-  }
-
-  if (
-    !streamsByChannel.has(
-      stream.channel
-    )
-  ) {
-    streamsByChannel.set(
-      stream.channel,
-      []
-    );
-  }
-
-  streamsByChannel
-    .get(
-      stream.channel
-    )
-    .push(
-      stream
-    );
-}
-
-/* =========================================================
- * Adult filter
- * ========================================================= */
-
-const adultKeywords = [
-  "xxx",
-  "adult",
-  "adults only",
-  "18+",
-  "18 plus",
-
-  "porn",
-  "porno",
-  "pornography",
-
-  "erotic",
-  "erotica",
-
-  "sex",
-  "sexy",
-
-  "playboy",
-  "penthouse",
-  "hustler",
-
-  "اباحي",
-  "إباحي",
-  "اباحية",
-  "إباحية",
-
-  "للكبار",
-  "للبالغين",
-
-  "جنسي",
-  "جنسية"
+const categoryOrder = [
+  "Quran",
+  "Kids",
+  "Family",
+  "Comedy",
+  "Theater",
+  "Series",
+  "Arabic Movies",
+  "Foreign Movies",
+  "Sports",
+  "Egypt TV"
 ];
 
-function isAdultChannel(
-  channel
-) {
-  if (
-    channel.is_nsfw
-  ) {
-    return true;
-  }
+const keywords = {
+  adult: [
+    "xxx", "adult", "adults only", "18+",
+    "porn", "porno", "pornography",
+    "erotic", "sex", "sexy",
+    "playboy", "penthouse", "hustler",
+    "اباحي", "إباحي", "اباحية", "إباحية",
+    "للكبار", "للبالغين", "جنسي", "جنسية"
+  ],
 
-  const categories =
-    channel.categories || [];
+  coptic: [
+    "coptic", "copts", "copt",
+    "coptic tv", "coptic orthodox",
+    "aghapy", "aghapi", "mesat", "me sat",
+    "logos coptic", "logos tv",
+    "ctv coptic", "ctv egypt", "ctv eg",
+    "coptic youth", "pope shenouda",
+    "shenouda tv",
+    "قبطي", "قبطى", "قبطية", "قبطيه",
+    "القبطية", "الأقباط", "الاقباط",
+    "الكنيسة القبطية", "الكنيسه القبطيه"
+  ],
 
-  if (
-    categories.includes(
-      "xxx"
-    )
-  ) {
-    return true;
-  }
+  blocked: ["koogi", "koogi tv"],
 
-  const text = `
-    ${channel.id || ""}
-    ${channel.name || ""}
-    ${(channel.alt_names || []).join(" ")}
-  `;
+  quran: [
+    "quran", "qur'an", "koran",
+    "holy quran", "quran kareem",
+    "قرآن", "القرآن", "القرآن الكريم"
+  ],
 
-  return includesKeyword(
-    text,
-    adultKeywords
+  theater: [
+    "theater", "theatre", "theatrical",
+    "stage play", "stage plays",
+    "classic plays", "masrah", "masra7",
+    "masrahiyat", "masrahyat",
+    "مسرح", "المسرح", "مسرحية",
+    "مسرحيات", "المسرحيات"
+  ],
+
+  comedy: [
+    "comedy", "comedies", "comic",
+    "funny", "laugh", "ضحك",
+    "كوميدي", "كوميديا", "كوميدى"
+  ],
+
+  family: [
+    "family", "families",
+    "عائلة", "العائلة",
+    "عائلي", "عائلية", "عائلى"
+  ],
+
+  sports: [
+    "sport", "sports", "football",
+    "soccer", "basketball", "tennis",
+    "racing", "match", "matches",
+    "رياضة", "رياضي", "رياضية",
+    "كرة", "مباريات"
+  ],
+
+  onTimeSports: [
+    "on sport", "on sports",
+    "ontime sport", "ontime sports",
+    "on time sport", "on time sports",
+    "أون سبورت", "اون سبورت",
+    "أون تايم سبورت", "اون تايم سبورت",
+    "أون تايم سبورتس", "اون تايم سبورتس"
+  ],
+
+  series: [
+    "drama", "series", "دراما", "مسلسلات"
+  ],
+
+  foreignMovies: [
+    "hollywood", "bollywood",
+    "action", "thriller", "english",
+    "hindi", "osn movies"
+  ],
+
+  arabicMovies: [
+    "rotana cinema", "aflam",
+    "cinema masr", "arabic",
+    "افلام", "أفلام", "سينما"
+  ]
+};
+
+function normalize(value) {
+  return String(value ?? "")
+    .toLowerCase()
+    .replace(/[^\p{L}\p{N}]+/gu, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function hasKeyword(text, words) {
+  const value = normalize(text);
+  return words.some(word =>
+    value.includes(normalize(word))
   );
 }
 
-/* =========================================================
- * Coptic filter
- * ========================================================= */
-
-const copticKeywords = [
-  "coptic",
-  "copts",
-  "copt",
-
-  "coptic tv",
-  "coptic channel",
-  "coptic satellite",
-  "coptic satellite channel",
-
-  "coptic orthodox",
-  "coptic orthodox tv",
-  "coptic orthodox church",
-
-  "orthodox coptic",
-
-  "قبطي",
-  "قبطى",
-  "قبطية",
-  "قبطيه",
-
-  "القبطية",
-  "القبطيه",
-
-  "الأقباط",
-  "الاقباط",
-
-  "الكنيسة القبطية",
-  "الكنيسه القبطيه",
-
-  "الكنيسة القبطية الأرثوذكسية",
-  "الكنيسه القبطيه الارثوذكسيه",
-
-  "aghapy",
-  "aghapi",
-  "aghapy tv",
-
-  "me sat",
-  "mesat",
-  "me sat tv",
-
-  "logos tv",
-  "logos coptic",
-  "logos coptic channel",
-
-  /*
-   * Never use "ctv" alone.
-   */
-  "ctv coptic",
-  "coptic ctv",
-  "ctv egypt",
-  "ctv eg",
-
-  "coptic youth",
-  "coptic youth channel",
-
-  "st mark coptic",
-  "saint mark coptic",
-
-  "st mary coptic",
-  "saint mary coptic",
-
-  "pope shenouda",
-  "shenouda tv"
-];
-
-function getCopticSearchText(
-  channel
-) {
-  return `
-    ${channel.id || ""}
-    ${channel.name || ""}
-    ${(channel.alt_names || []).join(" ")}
-    ${(channel.categories || []).join(" ")}
-    ${channel.network || ""}
-    ${channel.owner || ""}
-  `;
-}
-
-function isCopticChannel(
-  channel
-) {
-  return includesKeyword(
-    getCopticSearchText(
-      channel
-    ),
-    copticKeywords
-  );
-}
-
-/* =========================================================
- * Explicit blocked channels
- * ========================================================= */
-
-const blockedChannelKeywords = [
-  "koogi",
-  "koogi tv"
-];
-
-function isBlockedChannel(
-  channel
-) {
-  const text = `
-    ${channel.id || ""}
-    ${channel.name || ""}
-    ${(channel.alt_names || []).join(" ")}
-  `;
-
-  return includesKeyword(
-    text,
-    blockedChannelKeywords
-  );
-}
-
-function isBlockedExternalChannel(
-  item
-) {
-  const text = `
-    ${item.name || ""}
-    ${item.group || ""}
-    ${item.tvgId || ""}
-    ${item.raw || ""}
-  `;
-
-  return includesKeyword(
-    text,
-    blockedChannelKeywords
-  );
-}
-
-/* =========================================================
- * Language detection
- * ========================================================= */
-
-function getChannelLanguages(
-  channel
-) {
-  const detected =
-    new Set();
-
-  for (
-    const language
-    of channel.languages || []
-  ) {
-    detected.add(
-      normalizeLanguage(
-        language
-      )
-    );
-  }
-
-  const channelStreams =
-    streamsByChannel.get(
-      channel.id
-    ) || [];
-
-  for (
-    const stream
-    of channelStreams
-  ) {
-    if (!stream.feed) {
-      continue;
-    }
-
-    const feed =
-      feedMap.get(
-        `${stream.channel}@${stream.feed}`
-      );
-
-    if (!feed) {
-      continue;
-    }
-
-    for (
-      const language
-      of feed.languages || []
-    ) {
-      detected.add(
-        normalizeLanguage(
-          language
-        )
-      );
-    }
-  }
-
+function channelText(channel) {
   return [
-    ...detected
-  ].filter(
-    Boolean
+    channel.id,
+    channel.name,
+    ...(channel.alt_names || []),
+    ...(channel.categories || []),
+    channel.network,
+    channel.owner
+  ].filter(Boolean).join(" ");
+}
+
+function isBlocked(channel) {
+  const text = channelText(channel);
+
+  return Boolean(channel.is_nsfw) ||
+    (channel.categories || []).includes("xxx") ||
+    hasKeyword(text, keywords.adult) ||
+    hasKeyword(text, keywords.coptic) ||
+    hasKeyword(text, keywords.blocked);
+}
+
+function validLanguage(languages) {
+  if (!languages?.length) return true;
+
+  return languages.some(language =>
+    allowedLanguages.has(
+      String(language).toLowerCase()
+    )
   );
 }
 
-function isAllowedLanguage(
-  channel
-) {
-  const languages =
-    getChannelLanguages(
-      channel
-    );
+async function fetchWithTimeout(url, timeoutMs = 20000) {
+  const controller = new AbortController();
+  const timer = setTimeout(
+    () => controller.abort(),
+    timeoutMs
+  );
 
-  if (
-    !languages.length
-  ) {
-    return true;
+  try {
+    return await fetch(url, {
+      signal: controller.signal,
+      redirect: "follow",
+      headers: {
+        "User-Agent": "Mozilla/5.0 CarTV/1.0",
+        Accept: "*/*"
+      }
+    });
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+async function fetchJson(url) {
+  const response = await fetchWithTimeout(url, 45000);
+
+  if (!response.ok) {
+    throw new Error(`${url}: HTTP ${response.status}`);
   }
 
-  return languages.some(
-    language =>
-      allowedLanguages.has(
-        language
-      )
-  );
+  return response.json();
 }
 
-/* =========================================================
- * Category keywords
- * ========================================================= */
+async function fetchText(url) {
+  const response = await fetchWithTimeout(url, 45000);
 
-const quranKeywords = [
-  "quran",
-  "qur'an",
-  "koran",
+  if (!response.ok) {
+    throw new Error(`${url}: HTTP ${response.status}`);
+  }
 
-  "holy quran",
-  "quran kareem",
-
-  "قرآن",
-  "القرآن",
-  "القرآن الكريم"
-];
-
-/* -------------------------
- * Theater
- * ------------------------- */
-
-const theaterKeywords = [
-  "theater",
-  "theatre",
-  "theatrical",
-
-  "plays",
-
-  "stage play",
-  "stage plays",
-
-  "live theater",
-  "live theatre",
-
-  "performing arts",
-
-  "masrah",
-  "masra7",
-
-  "masrahiyat",
-  "masrahyat",
-
-  "masrahiya",
-  "masra7iyat",
-
-  "مسرح",
-  "المسرح",
-
-  "مسرحية",
-  "مسرحيات",
-  "المسرحيات",
-
-  "عرض مسرحي",
-  "عروض مسرحية",
-
-  "فنون مسرحية"
-];
-
-const theaterRelatedKeywords = [
-  "comedy theater",
-  "comedy theatre",
-
-  "musical theater",
-  "musical theatre",
-
-  "stage comedy",
-
-  "classic plays",
-
-  "مسرح كوميدي",
-  "مسرحيات كوميدية",
-
-  "مسرحيات مصرية",
-  "مسرحيات عربية",
-
-  "مسرحيات قديمة",
-  "مسرحيات كلاسيكية"
-];
-
-/* -------------------------
- * Comedy
- * ------------------------- */
-
-const comedyKeywords = [
-  "comedy",
-  "comedies",
-  "comic",
-
-  "funny",
-  "laugh",
-
-  "ضحك",
-
-  "كوميدي",
-  "كوميديا",
-  "كوميدى"
-];
-
-/* -------------------------
- * Family
- * ------------------------- */
-
-const familyKeywords = [
-  "family",
-  "families",
-
-  "family tv",
-  "family channel",
-
-  "عائلة",
-  "العائلة",
-
-  "عائلي",
-  "عائلية",
-  "عائلى"
-];
-
-/* -------------------------
- * Sports
- * ------------------------- */
-
-const sportsKeywords = [
-  "sport",
-  "sports",
-
-  "football",
-  "soccer",
-
-  "basketball",
-  "tennis",
-
-  "racing",
-
-  "match",
-  "matches",
-
-  "رياضة",
-  "رياضي",
-  "رياضية",
-
-  "كرة",
-  "مباريات"
-];
-
-/* =========================================================
- * ON / OnTime Sports
- *
- * Handles:
- * ON Sport
- * ON Sports
- * OnTime Sports
- * OnTime Sports 1
- * OnTime Sports 2
- * OnTime Sports 3
- * ========================================================= */
-
-const onTimeSportsKeywords = [
-  "on sport",
-  "on sports",
-
-  "ontime sport",
-  "ontime sports",
-
-  "on time sport",
-  "on time sports",
-
-  "ontime sports 1",
-  "ontime sports 2",
-  "ontime sports 3",
-
-  "on time sports 1",
-  "on time sports 2",
-  "on time sports 3",
-
-  "on sport 1",
-  "on sport 2",
-  "on sport 3",
-
-  "أون سبورت",
-  "اون سبورت",
-
-  "أون تايم سبورت",
-  "اون تايم سبورت",
-
-  "أون تايم سبورتس",
-  "اون تايم سبورتس"
-];
-
-function isOnTimeSportsChannel(
-  channel
-) {
-  const text = `
-    ${channel.id || ""}
-    ${channel.name || ""}
-    ${(channel.alt_names || []).join(" ")}
-  `;
-
-  return includesKeyword(
-    text,
-    onTimeSportsKeywords
-  );
+  return response.text();
 }
 
-/* =========================================================
- * Classification
- * ========================================================= */
+/*
+ * This only checks that an HLS manifest responds.
+ * It does not prove playback, geographic availability,
+ * or redistribution rights.
+ */
+async function validateHls(url, timeoutMs = 12000) {
+  try {
+    const response = await fetchWithTimeout(url, timeoutMs);
 
-function getPlaylistCategory(
-  channel
-) {
-  const channelCategories =
-    channel.categories || [];
+    if (!response.ok) return false;
 
-  const name =
-    channel.name || "";
+    const text = await response.text();
 
-  /* Quran */
+    return text.trimStart().startsWith("#EXTM3U");
+  } catch {
+    return false;
+  }
+}
+
+function parseM3U(text) {
+  const lines = text.split(/\r?\n/);
+  const items = [];
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i].trim();
+
+    if (!line.startsWith("#EXTINF")) continue;
+
+    const attrs = {};
+
+    for (const match of line.matchAll(
+      /([\w-]+)="([^"]*)"/g
+    )) {
+      attrs[match[1]] = match[2];
+    }
+
+    const name = line.slice(
+      line.lastIndexOf(",") + 1
+    ).trim();
+
+    let url = "";
+
+    for (let j = i + 1; j < lines.length; j++) {
+      const next = lines[j].trim();
+
+      if (!next) continue;
+      if (next.startsWith("#EXTINF")) break;
+      if (next.startsWith("#")) continue;
+
+      url = next;
+      break;
+    }
+
+    if (!url) continue;
+
+    items.push({
+      name,
+      url,
+      id: attrs["tvg-id"] || "",
+      logo: attrs["tvg-logo"] || "",
+      group: attrs["group-title"] || "",
+      country: attrs["tvg-country"] || "",
+      language: attrs["tvg-language"] || ""
+    });
+  }
+
+  return items;
+}
+
+function classify(channel, languages = []) {
+  const name = channel.name || "";
+  const categories = channel.categories || [];
 
   if (
-    channelCategories.includes(
-      "religious"
-    ) &&
-    ["EG", "SA"].includes(
-      channel.country
-    ) &&
-    includesKeyword(
-      name,
-      quranKeywords
-    )
+    ["EG", "SA"].includes(channel.country) &&
+    hasKeyword(name, keywords.quran)
   ) {
     return "Quran";
   }
 
-  /* Theater */
-
-  if (
-    includesKeyword(
-      name,
-      [
-        ...theaterKeywords,
-        ...theaterRelatedKeywords
-      ]
-    )
-  ) {
+  if (hasKeyword(name, keywords.theater)) {
     return "Theater";
   }
 
-  /* Comedy */
-
   if (
-    channelCategories.includes(
-      "comedy"
-    ) ||
-    includesKeyword(
-      name,
-      comedyKeywords
-    )
+    categories.includes("comedy") ||
+    hasKeyword(name, keywords.comedy)
   ) {
     return "Comedy";
   }
 
-  /* Sports
-   *
-   * OnTime Sports gets explicit
-   * priority here.
-   */
-
   if (
-    isOnTimeSportsChannel(
-      channel
-    ) ||
-    channelCategories.includes(
-      "sports"
-    ) ||
-    includesKeyword(
-      name,
-      sportsKeywords
-    )
+    categories.includes("sports") ||
+    hasKeyword(name, keywords.sports) ||
+    hasKeyword(name, keywords.onTimeSports)
   ) {
     return "Sports";
   }
 
-  /* Kids */
-
-  if (
-    channelCategories.includes(
-      "kids"
-    )
-  ) {
+  if (categories.includes("kids")) {
     return "Kids";
   }
 
-  /* Family */
-
   if (
-    channelCategories.includes(
-      "family"
-    ) ||
-    includesKeyword(
-      name,
-      familyKeywords
-    )
+    categories.includes("family") ||
+    hasKeyword(name, keywords.family)
   ) {
     return "Family";
   }
 
-  /* Series */
-
   if (
-    channelCategories.includes(
-      "series"
-    ) ||
-    includesKeyword(
-      name,
-      [
-        "drama",
-        "دراما",
-        "series",
-        "مسلسلات"
-      ]
-    )
+    categories.includes("series") ||
+    hasKeyword(name, keywords.series)
   ) {
     return "Series";
   }
 
-  /* Movies */
-
   if (
-    channelCategories.includes(
-      "movies"
-    )
+    categories.includes("movies") ||
+    hasKeyword(name, [
+      ...keywords.foreignMovies,
+      ...keywords.arabicMovies
+    ])
   ) {
-    const foreignKeywords = [
-      "hollywood",
-      "bollywood",
-
-      "action",
-      "thriller",
-
-      "english",
-      "hindi",
-
-      "cinema one",
-
-      "movies action",
-      "movies thriller",
-
-      "osn movies"
-    ];
-
-    if (
-      includesKeyword(
-        name,
-        foreignKeywords
-      )
-    ) {
+    if (hasKeyword(name, keywords.foreignMovies)) {
       return "Foreign Movies";
     }
 
-    const arabicMovieKeywords = [
-      "rotana cinema",
-
-      "aflam",
-      "cinema masr",
-
-      "arabic",
-      "masr",
-
-      "افلام",
-      "أفلام",
-
-      "سينما"
-    ];
-
-    if (
-      includesKeyword(
-        name,
-        arabicMovieKeywords
-      )
-    ) {
+    if (hasKeyword(name, keywords.arabicMovies)) {
       return "Arabic Movies";
     }
 
-    const languages =
-      getChannelLanguages(
-        channel
-      );
-
-    if (
-      languages.some(
-        language =>
-          [
-            "ar",
-            "ara",
-            "arb",
-            "arabic"
-          ].includes(
-            language
-          )
-      )
-    ) {
-      return "Arabic Movies";
-    }
-
-    return "Foreign Movies";
+    return languages.some(lang =>
+      ["ar", "ara", "arb", "arabic"].includes(lang)
+    ) ? "Arabic Movies" : "Foreign Movies";
   }
 
-  return null;
+  return channel.country === "EG"
+    ? "Egypt TV"
+    : null;
 }
 
-/* =========================================================
- * Stream scoring
- *
- * NO codec filtering.
- * ========================================================= */
-
-function scoreStream(
-  stream
-) {
+function scoreStream(stream) {
   let score = 0;
+  const url = stream.url || "";
 
-  const text =
-    `${
-      stream.title || ""
-    } ${
-      stream.label || ""
-    }`
-      .toLowerCase();
+  if (/\.m3u8(?:[?#]|$)/i.test(url)) score += 40;
+  if (!stream.referrer) score += 15;
+  if (!stream.user_agent) score += 10;
 
-  if (
-    text.includes(
-      "offline"
-    )
-  ) {
+  const quality = String(stream.quality || "");
+
+  if (/720p/i.test(quality)) score += 40;
+  else if (/1080p/i.test(quality)) score += 35;
+  else if (/576p/i.test(quality)) score += 25;
+  else if (/480p/i.test(quality)) score += 20;
+
+  if (/offline/i.test(stream.title || "")) {
     score -= 1000;
-  }
-
-  if (
-    text.includes(
-      "geo-blocked"
-    )
-  ) {
-    score -= 50;
-  }
-
-  if (
-    stream.url
-      ?.toLowerCase()
-      .includes(
-        ".m3u8"
-      )
-  ) {
-    score += 40;
-  }
-
-  if (
-    !stream.referrer
-  ) {
-    score += 15;
-  }
-
-  if (
-    !stream.user_agent
-  ) {
-    score += 10;
-  }
-
-  if (
-    stream.quality
-  ) {
-    const match =
-      stream.quality.match(
-        /(\d{3,4})p/i
-      );
-
-    if (
-      match
-    ) {
-      const quality =
-        Number(
-          match[1]
-        );
-
-      if (
-        quality === 720
-      ) {
-        score += 40;
-      }
-      else if (
-        quality === 1080
-      ) {
-        score += 35;
-      }
-      else if (
-        quality === 576
-      ) {
-        score += 25;
-      }
-      else if (
-        quality === 480
-      ) {
-        score += 20;
-      }
-      else if (
-        quality > 1080
-      ) {
-        score -= 10;
-      }
-    }
   }
 
   return score;
 }
 
-function selectBestStream(
-  channel
-) {
-  const available =
-    streamsByChannel.get(
-      channel.id
-    ) || [];
-
-  if (
-    !available.length
-  ) {
-    return null;
-  }
-
-  return [
-    ...available
-  ].sort(
-    (a, b) =>
-      scoreStream(
-        b
-      ) -
-      scoreStream(
-        a
-      )
-  )[0];
-}
-
-/* =========================================================
- * IPTV-org selection
- * ========================================================= */
-
-const selected = [];
-
-for (
-  const channel
-  of channels
-) {
-  if (
-    !allowedArabCountries.has(
-      channel.country
-    )
-  ) {
-    continue;
-  }
-
-  if (
-    isBlockedChannel(
-      channel
-    )
-  ) {
-    continue;
-  }
-
-  if (
-    !arabRegionCountries.has(
-      channel.country
-    )
-  ) {
-    continue;
-  }
-
-  if (
-    isAdultChannel(
-      channel
-    )
-  ) {
-    continue;
-  }
-
-  if (
-    isCopticChannel(
-      channel
-    )
-  ) {
-    continue;
-  }
-
-  if (
-    !isAllowedLanguage(
-      channel
-    )
-  ) {
-    continue;
-  }
-
-  const isEgypt =
-    channel.country ===
-    "EG";
-
-  const isWantedCategory =
-    channel.categories
-      ?.some(
-        category =>
-          sourceCategories.has(
-            category
-          )
-      );
-
-  /*
-   * Egypt is intentionally broader.
-   */
-
-  if (
-    !isEgypt &&
-    !isWantedCategory
-  ) {
-    continue;
-  }
-
-  let category =
-    getPlaylistCategory(
-      channel
-    );
-
-  if (
-    !category &&
-    isEgypt
-  ) {
-    category =
-      "Egypt TV";
-  }
-
-  if (
-    !category
-  ) {
-    continue;
-  }
-
-  const stream =
-    selectBestStream(
-      channel
-    );
-
-  if (
-    !stream
-  ) {
-    continue;
-  }
-
-  selected.push({
-    channel,
-    stream,
-    category,
-    source:
-      "IPTV-org"
-  });
-}
-
-/* =========================================================
- * M3U parser
- * ========================================================= */
-
-function parseM3U(
-  text
-) {
-  const lines =
-    String(
-      text || ""
-    ).split(
-      /\r?\n/
-    );
-
-  const result = [];
-
-  for (
-    let i = 0;
-    i < lines.length;
-    i++
-  ) {
-    const line =
-      lines[
-        i
-      ].trim();
-
-    if (
-      !line.startsWith(
-        "#EXTINF"
-      )
-    ) {
-      continue;
-    }
-
-    let url = "";
-
-    for (
-      let j = i + 1;
-      j < lines.length;
-      j++
-    ) {
-      const next =
-        lines[
-          j
-        ].trim();
-
-      if (
-        !next
-      ) {
-        continue;
-      }
-
-      if (
-        !next.startsWith(
-          "#"
-        )
-      ) {
-        url =
-          next;
-
-        break;
-      }
-    }
-
-    if (
-      !url
-    ) {
-      continue;
-    }
-
-    const name =
-      line.includes(
-        ","
-      )
-        ? line
-            .substring(
-              line.lastIndexOf(
-                ","
-              ) + 1
-            )
-            .trim()
-        : "Unknown";
-
-    const groupMatch =
-      line.match(
-        /group-title="([^"]*)"/i
-      );
-
-    const idMatch =
-      line.match(
-        /tvg-id="([^"]*)"/i
-      );
-
-    const logoMatch =
-      line.match(
-        /tvg-logo="([^"]*)"/i
-      );
-
-    const countryMatch =
-      line.match(
-        /tvg-country="([^"]*)"/i
-      );
-
-    const languageMatch =
-      line.match(
-        /tvg-language="([^"]*)"/i
-      );
-
-    result.push({
-      name,
-      url,
-
-      raw:
-        line,
-
-      group:
-        groupMatch?.[1] || "",
-
-      tvgId:
-        idMatch?.[1] || "",
-
-      logo:
-        logoMatch?.[1] || "",
-
-      country:
-        countryMatch?.[1]
-          ?.toUpperCase() ||
-        "",
-
-      language:
-        languageMatch?.[1] || ""
-    });
-  }
-
-  return result;
-}
-
-const freeTvChannels =
-  parseM3U(
-    freeTvText
-  );
-
-/* =========================================================
- * External source filters
- * ========================================================= */
-
-function isAdultExternalChannel(
-  item
-) {
-  const text = `
-    ${item.name || ""}
-    ${item.group || ""}
-    ${item.tvgId || ""}
-    ${item.raw || ""}
-  `;
-
-  return includesKeyword(
-    text,
-    adultKeywords
-  );
-}
-
-function isCopticExternalChannel(
-  item
-) {
-  const text = `
-    ${item.name || ""}
-    ${item.group || ""}
-    ${item.tvgId || ""}
-    ${item.raw || ""}
-  `;
-
-  return includesKeyword(
-    text,
-    copticKeywords
-  );
-}
-
-/* =========================================================
- * Egypt wanted names
- * ========================================================= */
-
-const egyptWanted = [
-  "mbc masr",
-  "mbc masr 1",
-  "mbc masr 2",
-  "mbc 1 egypt",
-
-  "alhayat",
-  "al hayat",
-
-  "al qahera news",
-  "cairo news",
-
-  "cbc",
-  "cbc drama",
-  "cbc sofra",
-
-  "dmc",
-  "dmc drama",
-
-  /*
-   * ON Entertainment
-   *
-   * Do NOT use "on" alone.
-   */
-  "on e",
-  "on tv",
-  "on drama",
-
-  /*
-   * ON / OnTime Sports
-   */
-  "on sport",
-  "on sports",
-
-  "ontime sport",
-  "ontime sports",
-
-  "on time sport",
-  "on time sports",
-
-  "ontime sports 1",
-  "ontime sports 2",
-  "ontime sports 3",
-
-  "on time sports 1",
-  "on time sports 2",
-  "on time sports 3",
-
-  "al nahar",
-  "al nahar drama",
-
-  "sada el balad",
-  "sada el balad drama",
-
-  "rotana cinema",
-
-  "mix hollywood",
-
-  "al masriyah",
-
-  "watan tv",
-
-  "comedy",
-  "family",
-
-  "theater",
-  "theatre",
-  "plays",
-  "stage",
-
-  "masrah",
-  "masrahiyat",
-  "masrahyat",
-
-  "مسرح",
-  "مسرحيات",
-  "مسرحية",
-
-  "sports"
-];
-
-function isWantedEgyptChannel(
-  name
-) {
-  const normalized =
-    normalizeName(
-      name
-    );
-
-  return egyptWanted.some(
-    wanted =>
-      normalized.includes(
-        normalizeName(
-          wanted
-        )
-      )
-  );
-}
-
-/* =========================================================
- * Egypt classification
- * ========================================================= */
-
-function classifyEgyptChannel(
-  name
-) {
-  const n =
-    normalizeName(
-      name
-    );
-
-  /* Theater */
-
-  if (
-    includesKeyword(
-      n,
-      [
-        ...theaterKeywords,
-        ...theaterRelatedKeywords
-      ]
-    )
-  ) {
-    return "Theater";
-  }
-
-  /* Comedy */
-
-  if (
-    includesKeyword(
-      n,
-      comedyKeywords
-    )
-  ) {
-    return "Comedy";
-  }
-
-  /*
-   * OnTime Sports explicit classification.
-   */
-
-  if (
-    includesKeyword(
-      n,
-      onTimeSportsKeywords
-    )
-  ) {
-    return "Sports";
-  }
-
-  /* Sports */
-
-  if (
-    includesKeyword(
-      n,
-      sportsKeywords
-    )
-  ) {
-    return "Sports";
-  }
-
-  /* Kids */
-
-  if (
-    includesKeyword(
-      n,
-      [
-        "kids",
-        "children",
-        "أطفال"
-      ]
-    )
-  ) {
-    return "Kids";
-  }
-
-  /* Family */
-
-  if (
-    includesKeyword(
-      n,
-      familyKeywords
-    )
-  ) {
-    return "Family";
-  }
-
-  /* Series */
-
-  if (
-    includesKeyword(
-      n,
-      [
-        "drama",
-        "دراما",
-        "series",
-        "مسلسلات"
-      ]
-    )
-  ) {
-    return "Series";
-  }
-
-  /* Foreign movies */
-
-  if (
-    includesKeyword(
-      n,
-      [
-        "hollywood",
-        "bollywood",
-
-        "action",
-        "thriller",
-
-        "english",
-        "hindi"
-      ]
-    )
-  ) {
-    return "Foreign Movies";
-  }
-
-  /* Arabic movies */
-
-  if (
-    includesKeyword(
-      n,
-      [
-        "rotana cinema",
-
-        "cinema",
-        "aflam",
-
-        "سينما",
-
-        "افلام",
-        "أفلام"
-      ]
-    )
-  ) {
-    return "Arabic Movies";
-  }
-
-  return "Egypt TV";
-}
-
-/* =========================================================
- * Dedupe helpers
- * ========================================================= */
-
-function channelKey(
-  name
-) {
-  return normalizeName(
-    name
-  )
+function dedupeName(name) {
+  return normalize(name)
     .replace(
-      /\bhd\b/g,
+      /\b(hd|sd|fhd|uhd|4k|1080p|720p)\b/g,
       ""
     )
-    .replace(
-      /\bsd\b/g,
-      ""
-    )
-    .replace(
-      /\bfhd\b/g,
-      ""
-    )
-    .replace(
-      /\buhd\b/g,
-      ""
-    )
-    .replace(
-      /\b4k\b/g,
-      ""
-    )
-    .replace(
-      /\b1080p\b/g,
-      ""
-    )
-    .replace(
-      /\b720p\b/g,
-      ""
-    )
-    .replace(
-      /\b576p\b/g,
-      ""
-    )
-    .replace(
-      /\b480p\b/g,
-      ""
-    )
-    .replace(
-      /\s+/g,
-      " "
-    )
+    .replace(/\s+/g, " ")
     .trim();
 }
 
-function streamKey(
-  url
-) {
-  return String(
-    url || ""
-  )
-    .trim()
-    .toLowerCase();
-}
+const selected = [];
+const existingNames = new Set();
+const existingUrls = new Set();
 
-const existingNames =
-  new Set(
-    selected.map(
-      item =>
-        channelKey(
-          item.channel.name
-        )
-    )
-  );
-
-const existingStreams =
-  new Set(
-    selected.map(
-      item =>
-        streamKey(
-          item.stream.url
-        )
-    )
-  );
-
-/* =========================================================
- * Add Egypt channels from Free-TV
- * ========================================================= */
-
-for (
-  const item
-  of freeTvChannels
-) {
-  if (
-    isBlockedExternalChannel(
-      item
-    )
-  ) {
-    continue;
-  }
-
-  const group =
-    normalizeName(
-      item.group
-    );
-
-  const isEgypt =
-    group === "egypt" ||
-    group.includes(
-      "egypt"
-    );
-
-  if (
-    !isEgypt
-  ) {
-    continue;
-  }
-
-  if (
-    !allowedArabCountries.has(
-      "EG"
-    )
-  ) {
-    continue;
-  }
-
-  if (
-    isAdultExternalChannel(
-      item
-    )
-  ) {
-    continue;
-  }
-
-  if (
-    isCopticExternalChannel(
-      item
-    )
-  ) {
-    continue;
-  }
-
-  if (
-    !isWantedEgyptChannel(
-      item.name
-    )
-  ) {
-    continue;
-  }
-
-  if (
-    !item.url ||
-    !/^https?:\/\//i.test(
-      item.url
-    )
-  ) {
-    continue;
+function addChannel(item) {
+  if (!item.url || !/^https?:\/\//i.test(item.url)) {
+    return false;
   }
 
   const nameKey =
-    channelKey(
-      item.name
-    );
+    `${item.country}:${dedupeName(item.name)}`;
 
-  const urlKey =
-    streamKey(
-      item.url
-    );
+  const urlKey = item.url.trim();
 
   if (
-    existingNames.has(
-      nameKey
-    ) ||
-    existingStreams.has(
-      urlKey
-    )
+    existingNames.has(nameKey) ||
+    existingUrls.has(urlKey)
   ) {
-    continue;
+    return false;
   }
 
-  existingNames.add(
-    nameKey
+  const channel = {
+    id: item.id,
+    name: item.name,
+    country: item.country,
+    categories: [item.category]
+  };
+
+  if (isBlocked(channel)) return false;
+
+  existingNames.add(nameKey);
+  existingUrls.add(urlKey);
+  selected.push(item);
+
+  return true;
+}
+
+console.log("Loading IPTV-org and Free-TV...");
+
+const [
+  channels,
+  streams,
+  feeds,
+  regions,
+  logos,
+  freeTvText
+] = await Promise.all([
+  fetchJson(`${API}/channels.json`),
+  fetchJson(`${API}/streams.json`),
+  fetchJson(`${API}/feeds.json`),
+  fetchJson(`${API}/regions.json`),
+  fetchJson(`${API}/logos.json`),
+  fetchText(FREE_TV_URL)
+]);
+
+const arabRegion = regions.find(
+  region => region.code === "ARAB"
+);
+
+if (!arabRegion) {
+  throw new Error("ARAB region not found");
+}
+
+const arabCountries = new Set(arabRegion.countries);
+
+const feedMap = new Map(
+  feeds.map(feed => [
+    `${feed.channel}@${feed.id}`,
+    feed
+  ])
+);
+
+const logoMap = new Map();
+
+for (const logo of logos) {
+  if (
+    logo.in_use &&
+    !logoMap.has(logo.channel)
+  ) {
+    logoMap.set(logo.channel, logo.url);
+  }
+}
+
+const streamsByChannel = new Map();
+
+for (const stream of streams) {
+  if (!stream.channel || !stream.url) continue;
+
+  if (!streamsByChannel.has(stream.channel)) {
+    streamsByChannel.set(stream.channel, []);
+  }
+
+  streamsByChannel.get(stream.channel).push(stream);
+}
+
+for (const channel of channels) {
+  if (!allowedCountries.has(channel.country)) continue;
+  if (!arabCountries.has(channel.country)) continue;
+  if (isBlocked(channel)) continue;
+
+  const available = streamsByChannel.get(channel.id) || [];
+  if (!available.length) continue;
+
+  const languages = new Set(channel.languages || []);
+
+  for (const stream of available) {
+    const feed = feedMap.get(
+      `${stream.channel}@${stream.feed}`
+    );
+
+    for (const lang of feed?.languages || []) {
+      languages.add(lang);
+    }
+  }
+
+  const normalizedLanguages = [...languages].map(
+    lang => String(lang).toLowerCase()
   );
 
-  existingStreams.add(
-    urlKey
+  if (!validLanguage(normalizedLanguages)) continue;
+
+  const isEgypt = channel.country === "EG";
+
+  const wantedCategory = (channel.categories || [])
+    .some(category => sourceCategories.has(category));
+
+  if (!isEgypt && !wantedCategory) continue;
+
+  const category = classify(
+    channel,
+    normalizedLanguages
   );
 
-  selected.push({
-    channel: {
-      id:
-        item.tvgId ||
-        `FreeTV.${nameKey
-          .replace(
-            /\s+/g,
-            ""
-          )}.eg`,
+  if (!category) continue;
 
-      name:
-        item.name,
+  const bestStream = [...available].sort(
+    (a, b) => scoreStream(b) - scoreStream(a)
+  )[0];
 
-      country:
-        "EG"
-    },
-
-    stream: {
-      url:
-        item.url
-    },
-
-    category:
-      classifyEgyptChannel(
-        item.name
-      ),
-
-    logo:
-      item.logo,
-
-    source:
-      "Free-TV"
+  addChannel({
+    id: channel.id,
+    name: channel.name,
+    country: channel.country,
+    category,
+    url: bestStream.url,
+    logo: logoMap.get(channel.id) || "",
+    source: "IPTV-org"
   });
 }
 
-/* =========================================================
- * Curated Egypt fallback candidates
+/* Free-TV: Egypt enrichment only */
+
+const freeTvChannels = parseM3U(freeTvText);
+
+const egyptWanted = [
+  "mbc masr", "mbc 1 egypt",
+  "alhayat", "al hayat",
+  "al qahera news", "cairo news",
+  "cbc", "dmc",
+  "on e", "on tv", "on drama",
+  "on sport", "on sports",
+  "ontime sport", "ontime sports",
+  "on time sport", "on time sports",
+  "al nahar", "sada el balad",
+  "rotana cinema", "mix hollywood",
+  "al masriyah", "watan tv",
+  "comedy", "family",
+  "theater", "theatre", "masrah",
+  "مسرح", "مسرحيات",
+  "sports"
+];
+
+for (const item of freeTvChannels) {
+  const isEgypt =
+    normalize(item.group).includes("egypt") ||
+    item.country.toUpperCase() === "EG";
+
+  if (!isEgypt) continue;
+
+  if (!hasKeyword(item.name, egyptWanted)) continue;
+
+  const channel = {
+    id: item.id,
+    name: item.name,
+    country: "EG",
+    categories: []
+  };
+
+  if (isBlocked(channel)) continue;
+
+  addChannel({
+    id: item.id || `FreeTV.${dedupeName(item.name)}.eg`,
+    name: item.name,
+    country: "EG",
+    category: classify(channel) || "Egypt TV",
+    url: item.url,
+    logo: item.logo,
+    source: "Free-TV"
+  });
+}
+
+/*
+ * Egypt fallback candidates.
  *
- * IMPORTANT:
- * These candidates are NOT trusted automatically.
- * Every URL must pass isValidHls() before inclusion.
- *
- * OnTime Sports is NOT given an untrusted hardcoded
- * stream here. IPTV-org + Free-TV discovery above will
- * automatically include it whenever a public stream exists.
- * ========================================================= */
+ * These are unverified third-party URLs.
+ * They are included only when the HLS manifest
+ * responds successfully during generation.
+ */
 
 const egyptFallbackCandidates = [
   {
-    id:
-      "ONE.eg",
-
-    name:
-      "ON E",
-
-    category:
-      "Egypt TV",
-
+    id: "ONE.eg",
+    name: "ON E",
+    category: "Egypt TV",
     url:
-      "https://bcovlive-a.akamaihd.net/3dc60bab470f4c9fbf00408ecb7c3d7a/eu-west-1/6057955906001/playlist_dvr.m3u8",
-
-    logo:
-      ""
+      "https://bcovlive-a.akamaihd.net/3dc60bab470f4c9fbf00408ecb7c3d7a/eu-west-1/6057955906001/playlist_dvr.m3u8"
   },
-
   {
-    id:
-      "ONDrama.eg",
-
-    name:
-      "ON Drama",
-
-    category:
-      "Series",
-
+    id: "ONDrama.eg",
+    name: "ON Drama",
+    category: "Series",
     url:
-      "https://live20.bozztv.com/gin-36bay4/ga-ondrama/tracks-v1a1/mono.m3u8",
-
-    logo:
-      ""
+      "https://live20.bozztv.com/gin-36bay4/ga-ondrama/tracks-v1a1/mono.m3u8"
   },
-
   {
-    id:
-      "AlNahar.eg",
-
-    name:
-      "Al Nahar",
-
-    category:
-      "Egypt TV",
-
+    id: "AlNahar.eg",
+    name: "Al Nahar",
+    category: "Egypt TV",
     url:
-      "https://live20.bozztv.com/gin-36bay4/ga-alnahar/tracks-v1a1/mono.m3u8",
-
-    logo:
-      ""
+      "https://live20.bozztv.com/gin-36bay4/ga-alnahar/tracks-v1a1/mono.m3u8"
   },
-
   {
-    id:
-      "AlNaharDrama.eg",
-
-    name:
-      "Al Nahar Drama",
-
-    category:
-      "Series",
-
+    id: "AlNaharDrama.eg",
+    name: "Al Nahar Drama",
+    category: "Series",
     url:
-      "https://live20.bozztv.com/gin-36bay4/ga-alnahardrama/tracks-v1a1/mono.m3u8",
-
-    logo:
-      ""
+      "https://live20.bozztv.com/gin-36bay4/ga-alnahardrama/tracks-v1a1/mono.m3u8"
   },
-
   {
-    id:
-      "DMCDrama.eg",
-
-    name:
-      "DMC Drama",
-
-    category:
-      "Series",
-
+    id: "DMCDrama.eg",
+    name: "DMC Drama",
+    category: "Series",
     url:
-      "https://uvotv-aniview.global.ssl.fastly.net/10010/dvr/hls/dmcdrama/playlist.m3u8",
-
-    logo:
-      ""
+      "https://uvotv-aniview.global.ssl.fastly.net/10010/dvr/hls/dmcdrama/playlist.m3u8"
   },
-
   {
-    id:
-      "SadaElBalad.eg",
-
-    name:
-      "Sada El Balad",
-
-    category:
-      "Egypt TV",
-
+    id: "SadaElBalad.eg",
+    name: "Sada El Balad",
+    category: "Egypt TV",
     url:
-      "https://uvotv-aniview.global.ssl.fastly.net/10010/dvr/hls/sadaalbalad/playlist.m3u8",
-
-    logo:
-      ""
+      "https://uvotv-aniview.global.ssl.fastly.net/10010/dvr/hls/sadaalbalad/playlist.m3u8"
   },
-
   {
-    id:
-      "SadaElBaladDrama.eg",
-
-    name:
-      "Sada El Balad Drama",
-
-    category:
-      "Series",
-
+    id: "SadaElBaladDrama.eg",
+    name: "Sada El Balad Drama",
+    category: "Series",
     url:
-      "https://uvotv-aniview.global.ssl.fastly.net/10010/dvr/hls/sadaalbaladdrama/playlist.m3u8",
-
-    logo:
-      ""
+      "https://uvotv-aniview.global.ssl.fastly.net/10010/dvr/hls/sadaalbaladdrama/playlist.m3u8"
   }
 ];
 
-/* =========================================================
- * Add validated Egypt fallback
- * ========================================================= */
+console.log("Checking Egypt fallback candidates...");
 
-console.log("");
+for (const candidate of egyptFallbackCandidates) {
+  const exists = selected.some(item =>
+    item.country === "EG" &&
+    dedupeName(item.name) === dedupeName(candidate.name)
+  );
 
-console.log(
-  "Checking Egypt fallback streams..."
-);
+  if (exists) continue;
 
-for (
-  const candidate
-  of egyptFallbackCandidates
-) {
-  const candidateChannel = {
-    id:
-      candidate.id,
+  const valid = await validateHls(candidate.url);
 
-    name:
-      candidate.name,
-
-    country:
-      "EG",
-
-    alt_names:
-      [],
-
-    categories:
-      []
-  };
-
-  if (
-    isBlockedChannel(
-      candidateChannel
-    )
-  ) {
+  if (!valid) {
+    console.log(`Skipped: ${candidate.name}`);
     continue;
   }
 
-  if (
-    isCopticChannel(
-      candidateChannel
-    )
-  ) {
-    continue;
+  if (addChannel({
+    ...candidate,
+    country: "EG",
+    logo: "",
+    source: "Egypt-Fallback"
+  })) {
+    console.log(`Added: ${candidate.name}`);
   }
-
-  const nameKey =
-    channelKey(
-      candidate.name
-    );
-
-  const urlKey =
-    streamKey(
-      candidate.url
-    );
-
-  if (
-    existingNames.has(
-      nameKey
-    ) ||
-    existingStreams.has(
-      urlKey
-    )
-  ) {
-    console.log(
-      `↪ Already exists: ${candidate.name}`
-    );
-
-    continue;
-  }
-
-  console.log(
-    `🔎 Checking: ${candidate.name}`
-  );
-
-  const valid =
-    await isValidHls(
-      candidate.url
-    );
-
-  if (
-    !valid
-  ) {
-    console.log(
-      `⚠️ Skipped unavailable fallback: ${candidate.name}`
-    );
-
-    continue;
-  }
-
-  existingNames.add(
-    nameKey
-  );
-
-  existingStreams.add(
-    urlKey
-  );
-
-  selected.push({
-    channel:
-      candidateChannel,
-
-    stream: {
-      url:
-        candidate.url
-    },
-
-    category:
-      candidate.category,
-
-    logo:
-      candidate.logo,
-
-    source:
-      "Egypt-Fallback"
-  });
-
-  console.log(
-    `✅ Added fallback: ${candidate.name}`
-  );
 }
 
-/* =========================================================
- * Final safety filtering
- * ========================================================= */
+/*
+ * New: beIN SPORTS XTRA.
+ *
+ * A free-to-view channel candidate.
+ * Not the subscription beIN SPORTS 1-9 channels.
+ *
+ * Region is International to avoid claiming
+ * this is the Qatar/MENA channel.
+ */
 
-const finalSelected =
-  selected.filter(
-    item => {
-      if (
-        !allowedArabCountries.has(
-          item.channel.country
-        )
-      ) {
-        return false;
-      }
-
-      if (
-        isBlockedChannel(
-          item.channel
-        )
-      ) {
-        return false;
-      }
-
-      if (
-        isAdultChannel(
-          item.channel
-        )
-      ) {
-        return false;
-      }
-
-      if (
-        isCopticChannel(
-          item.channel
-        )
-      ) {
-        return false;
-      }
-
-      return true;
-    }
-  );
-
-/* =========================================================
- * Category order
- * ========================================================= */
-
-const categoryOrder = {
-  Quran: 1,
-
-  Kids: 2,
-
-  Family: 3,
-
-  Comedy: 4,
-
-  Theater: 5,
-
-  Series: 6,
-
-  "Arabic Movies": 7,
-
-  "Foreign Movies": 8,
-
-  Sports: 9,
-
-  "Egypt TV": 10
-};
-
-/* =========================================================
- * Sorting
- * ========================================================= */
-
-finalSelected.sort(
-  (a, b) => {
-    const countryA =
-      countryName(
-        a.channel.country
-      );
-
-    const countryB =
-      countryName(
-        b.channel.country
-      );
-
-    if (
-      countryA !==
-      countryB
-    ) {
-      return countryA.localeCompare(
-        countryB
-      );
-    }
-
-    const orderA =
-      categoryOrder[
-        a.category
-      ] ?? 99;
-
-    const orderB =
-      categoryOrder[
-        b.category
-      ] ?? 99;
-
-    if (
-      orderA !==
-      orderB
-    ) {
-      return (
-        orderA -
-        orderB
-      );
-    }
-
-    return String(
-      a.channel.name || ""
-    ).localeCompare(
-      String(
-        b.channel.name || ""
-      )
-    );
+const internationalCandidates = [
+  {
+    id: "beINSportsXTRA.int",
+    name: "beIN SPORTS XTRA",
+    country: "INT",
+    category: "Sports",
+    logo: "",
+    url: "https://bein-xtra-bein.amagi.tv/playlist.m3u8",
+    source: "International-Fallback"
   }
-);
+];
 
-/* =========================================================
- * Generate M3U
- * ========================================================= */
+console.log("Checking international sports...");
 
-const output = [];
+for (const candidate of internationalCandidates) {
+  const valid = await validateHls(candidate.url);
 
-output.push(
-  '#EXTM3U x-tvg-url="https://raw.githubusercontent.com/StrangeDrVN/epg/public/output/guide.xml.gz"'
-);
-
-output.push(
-  "# Generated automatically from IPTV-org + Free-TV + validated Egypt fallback"
-);
-
-output.push(
-  "# Countries: BH, EG, JO, KW, PS, QA, SA, SY, TN, AE"
-);
-
-output.push(
-  "# Filters: Selected Arab countries + Arabic/English/Hindi + No Adult + No Coptic + Koogi Blocked"
-);
-
-output.push(
-  "# Egypt discovery: ON / OnTime Sports / Al Nahar / DMC / Sada El Balad"
-);
-
-output.push(
-  "# Playback: No codec-based channel filtering"
-);
-
-output.push(
-  `# Generated: ${new Date().toISOString()}`
-);
-
-output.push("");
-
-/* =========================================================
- * Playlist entries
- * ========================================================= */
-
-let currentGroup =
-  null;
-
-for (
-  const item
-  of finalSelected
-) {
-  const {
-    channel,
-    stream,
-    category
-  } = item;
-
-  const country =
-    countryName(
-      channel.country
+  if (!valid) {
+    console.log(
+      `Skipped (unavailable or restricted): ${candidate.name}`
     );
-
-  const group =
-    `${country} | ${category}`;
-
-  if (
-    group !==
-    currentGroup
-  ) {
-    currentGroup =
-      group;
-
-    output.push(
-      `# === ${group} ===`
-    );
+    continue;
   }
 
-  const logo =
-    item.logo ||
-    logoMap.get(
-      channel.id
-    ) ||
-    "";
+  if (addChannel(candidate)) {
+    console.log(`Added: ${candidate.name}`);
+  }
+}
 
-  const name =
-    String(
-      channel.name ||
-      ""
-    )
-      .replace(
-        /\r?\n/g,
-        " "
-      )
-      .trim();
+/*
+ * Sort by country, category and name.
+ */
 
-  const safeName =
-    name.replace(
-      /"/g,
-      "'"
-    );
+selected.sort((a, b) => {
+  const countryA = countryNames[a.country] ||
+    (a.country === "INT" ? "International" : a.country);
 
-  const safeGroup =
-    group.replace(
-      /"/g,
-      "'"
-    );
+  const countryB = countryNames[b.country] ||
+    (b.country === "INT" ? "International" : b.country);
 
-  const safeId =
-    String(
-      channel.id ||
-      ""
-    ).replace(
-      /"/g,
-      "'"
-    );
+  const countryCompare = countryA.localeCompare(countryB);
 
-  const safeLogo =
-    String(
-      logo ||
-      ""
-    ).replace(
-      /"/g,
-      "%22"
-    );
+  if (countryCompare !== 0) return countryCompare;
 
-  const attributes = [
-    `tvg-id="${safeId}"`,
+  const categoryA = categoryOrder.indexOf(a.category);
+  const categoryB = categoryOrder.indexOf(b.category);
 
-    `tvg-name="${safeName}"`,
+  if (categoryA !== categoryB) {
+    return categoryA - categoryB;
+  }
 
-    safeLogo
-      ? `tvg-logo="${safeLogo}"`
+  return a.name.localeCompare(b.name);
+});
+
+/*
+ * Write M3U.
+ */
+
+function escapeAttribute(value) {
+  return String(value || "")
+    .replace(/"/g, "'")
+    .replace(/[\r\n]/g, " ");
+}
+
+const output = [
+  `#EXTM3U x-tvg-url="${EPG_URL}"`,
+  "# Generated from IPTV-org + Free-TV + validated fallback",
+  `# Countries: ${Object.keys(countryNames).join(", ")} + International`,
+  "# Categories: Quran, Kids, Family, Comedy, Theater, Series, Arabic Movies, Foreign Movies, Sports, Egypt TV",
+  "# beIN SPORTS XTRA: validated candidate only",
+  "# No codec-based filtering",
+  `# Generated: ${new Date().toISOString()}`,
+  ""
+];
+
+let currentGroup = "";
+
+for (const item of selected) {
+  const countryName = countryNames[item.country] ||
+    (item.country === "INT" ? "International" : item.country);
+
+  const group = `${countryName} | ${item.category}`;
+
+  if (group !== currentGroup) {
+    currentGroup = group;
+    output.push(`# === ${group} ===`);
+  }
+
+  const name = escapeAttribute(item.name);
+
+  const attrs = [
+    `tvg-id="${escapeAttribute(item.id)}"`,
+    `tvg-name="${name}"`,
+    item.logo
+      ? `tvg-logo="${escapeAttribute(item.logo)}"`
       : "",
+    `group-title="${escapeAttribute(group)}"`
+  ].filter(Boolean).join(" ");
 
-    `group-title="${safeGroup}"`
-  ]
-    .filter(
-      Boolean
-    )
-    .join(
-      " "
-    );
-
-  output.push(
-    `#EXTINF:-1 ${attributes},${name}`
-  );
-
-  output.push(
-    stream.url
-  );
-
+  output.push(`#EXTINF:-1 ${attrs},${name}`);
+  output.push(item.url);
   output.push("");
 }
 
-/* =========================================================
- * Write playlist
- * ========================================================= */
-
-await fs.mkdir(
-  "playlists",
-  {
-    recursive: true
-  }
-);
+await fs.mkdir("playlists", { recursive: true });
 
 await fs.writeFile(
-  "playlists/arab-tv.m3u",
-  output.join(
-    "\n"
-  ),
+  OUTPUT_FILE,
+  output.join("\n"),
   "utf8"
 );
 
-/* =========================================================
- * Summary
- * ========================================================= */
+console.log(`Generated ${selected.length} channels`);
 
-console.log("");
+const summary = {};
 
-console.log(
-  "================================="
-);
+for (const item of selected) {
+  const country = countryNames[item.country] ||
+    (item.country === "INT" ? "International" : item.country);
 
-console.log(
-  `✅ Generated ${finalSelected.length} channels`
-);
+  const key = `${country} | ${item.category}`;
 
-console.log(
-  "================================="
-);
-
-/* =========================================================
- * Country summary
- * ========================================================= */
-
-const countrySummary = {};
-
-for (
-  const item
-  of finalSelected
-) {
-  const country =
-    countryName(
-      item.channel.country
-    );
-
-  countrySummary[
-    country
-  ] =
-    (
-      countrySummary[
-        country
-      ] || 0
-    ) + 1;
+  summary[key] = (summary[key] || 0) + 1;
 }
 
-console.log("");
+console.table(summary);
 
-console.log(
-  "Countries"
+const onTime = selected.filter(item =>
+  item.country === "EG" &&
+  hasKeyword(item.name, keywords.onTimeSports)
 );
 
 console.log(
-  "================================="
+  `OnTime Sports channels found: ${onTime.length}`
 );
 
-console.table(
-  countrySummary
-);
-
-/* =========================================================
- * Category summary
- * ========================================================= */
-
-const categorySummary = {};
-
-for (
-  const item
-  of finalSelected
-) {
-  const key =
-    `${countryName(
-      item.channel.country
-    )} | ${item.category}`;
-
-  categorySummary[
-    key
-  ] =
-    (
-      categorySummary[
-        key
-      ] || 0
-    ) + 1;
-}
-
-console.log("");
-
-console.log(
-  "Categories"
+const beinXtra = selected.find(
+  item => item.id === "beINSportsXTRA.int"
 );
 
 console.log(
-  "================================="
+  beinXtra
+    ? "beIN SPORTS XTRA added successfully"
+    : "beIN SPORTS XTRA not added: validation failed"
 );
 
-console.table(
-  categorySummary
-);
-
-/* =========================================================
- * Source summary
- * ========================================================= */
-
-const sourceSummary = {};
-
-for (
-  const item
-  of finalSelected
-) {
-  const source =
-    item.source ||
-    "Unknown";
-
-  sourceSummary[
-    source
-  ] =
-    (
-      sourceSummary[
-        source
-      ] || 0
-    ) + 1;
-}
-
-console.log("");
-
-console.log(
-  "Sources"
-);
-
-console.log(
-  "================================="
-);
-
-console.table(
-  sourceSummary
-);
-
-/* =========================================================
- * OnTime Sports summary
- * ========================================================= */
-
-const onTimeSportsFound =
-  finalSelected.filter(
-    item =>
-      item.channel.country ===
-        "EG" &&
-      isOnTimeSportsChannel(
-        item.channel
-      )
-  );
-
-console.log("");
-
-console.log(
-  "OnTime Sports"
-);
-
-console.log(
-  "================================="
-);
-
-if (
-  onTimeSportsFound.length
-) {
-  for (
-    const item
-    of onTimeSportsFound
-  ) {
-    console.log(
-      `✅ ${item.channel.name} [${item.source}]`
-    );
-  }
-}
-else {
-  console.log(
-    "ℹ️ No public OnTime Sports stream found in the current sources."
-  );
-}
-
-/* =========================================================
- * Configuration summary
- * ========================================================= */
-
-console.log("");
-
-console.log(
-  "================================="
-);
-
-console.log(
-  "Playlist configuration"
-);
-
-console.log(
-  "================================="
-);
-
-console.log(
-  "✅ IPTV-org"
-);
-
-console.log(
-  "✅ Free-TV"
-);
-
-console.log(
-  "✅ Validated Egypt fallback"
-);
-
-console.log(
-  "✅ Bahrain"
-);
-
-console.log(
-  "✅ Egypt"
-);
-
-console.log(
-  "✅ Jordan"
-);
-
-console.log(
-  "✅ Kuwait"
-);
-
-console.log(
-  "✅ Palestine"
-);
-
-console.log(
-  "✅ Qatar"
-);
-
-console.log(
-  "✅ Saudi Arabia"
-);
-
-console.log(
-  "✅ Syria"
-);
-
-console.log(
-  "✅ Tunisia"
-);
-
-console.log(
-  "✅ United Arab Emirates"
-);
-
-console.log(
-  "✅ Arabic"
-);
-
-console.log(
-  "✅ English"
-);
-
-console.log(
-  "✅ Hindi allowed"
-);
-
-console.log(
-  "✅ Adult / XXX blocked"
-);
-
-console.log(
-  "✅ Coptic channels blocked"
-);
-
-console.log(
-  "✅ Koogi blocked"
-);
-
-console.log(
-  "✅ Quran"
-);
-
-console.log(
-  "✅ Kids"
-);
-
-console.log(
-  "✅ Family"
-);
-
-console.log(
-  "✅ Comedy"
-);
-
-console.log(
-  "✅ Theater classification ready"
-);
-
-console.log(
-  "✅ Series"
-);
-
-console.log(
-  "✅ Arabic Movies"
-);
-
-console.log(
-  "✅ Foreign Movies"
-);
-
-console.log(
-  "✅ Sports"
-);
-
-console.log(
-  "✅ OnTime Sports discovery"
-);
-
-console.log(
-  "✅ Egypt general TV"
-);
-
-console.log(
-  "✅ Egypt fallback streams tested before inclusion"
-);
-
-console.log(
-  "✅ Audio-only / Radio streams allowed"
-);
-
-console.log(
-  "✅ No codec-based stream removal"
-);
-
-console.log(
-  "================================="
-);
+console.log(`Playlist saved: ${OUTPUT_FILE}`);

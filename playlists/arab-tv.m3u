@@ -4,7 +4,7 @@
 # Categories: Quran, Kids, Family, Comedy, Theater, Series, Arabic Movies, Foreign Movies, Sports, Egypt TV
 # beIN SPORTS XTRA: validated candidate only
 # No codec-based filtering
-# Generated: 2026-10-21T20:56:31.129Z
+# Generated: 2026-10-22T01:59:38.012Z
 
 # === Bahrain | Sports ===
 #EXTINF:-1 tvg-id="BahrainSports1.bh" tvg-name="Bahrain Sports 1" tvg-logo="https://i.imgur.com/fBpLsbC.png" group-title="Bahrain | Sports",Bahrain Sports 1
@@ -166,6 +166,9 @@ https://shd-gcp-live.edgenextcdn.net/live/bitmovin-al-souriya-tv/e3150760fa5fd62
 https://cdn.bestream.io/prime/prime.m3u8
 
 # === United Arab Emirates | Kids ===
+#EXTINF:-1 tvg-id="CartoonNetworkArabic.ae" tvg-name="Cartoon Network Arabic" tvg-logo="https://upload.wikimedia.org/wikipedia/commons/thumb/b/bb/Cartoon_Network_Arabic_logo.png/960px-Cartoon_Network_Arabic_logo.png" group-title="United Arab Emirates | Kids",Cartoon Network Arabic
+http://149.100.11.252:8000/play/a056/index.m3u8
+
 #EXTINF:-1 tvg-id="SpacetoonArabic.ae" tvg-name="Spacetoon Arabic" tvg-logo="https://upload.wikimedia.org/wikipedia/en/2/2b/Spacetoon_logo.png" group-title="United Arab Emirates | Kids",Spacetoon Arabic
 https://live-uae-next.spacetoongo.com/ST_MENA_NEXT/hls/r9p2hjipmw2kl.m3u8
 

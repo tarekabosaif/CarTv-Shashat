@@ -4,7 +4,7 @@
 # Categories: Quran, Kids, Family, Comedy, Theater, Series, Arabic Movies, Foreign Movies, Sports, Egypt TV
 # beIN SPORTS XTRA: validated candidate only
 # No codec-based filtering
-# Generated: 2026-10-28T21:55:14.292Z
+# Generated: 2026-10-29T02:57:59.313Z
 
 # === Bahrain | Sports ===
 #EXTINF:-1 tvg-id="BahrainSports1.bh" tvg-name="Bahrain Sports 1" tvg-logo="https://i.imgur.com/fBpLsbC.png" group-title="Bahrain | Sports",Bahrain Sports 1
@@ -43,6 +43,9 @@ https://9090video.mobtada.com/hls/stream.m3u8
 
 #EXTINF:-1 tvg-id="HudaTV.eg" tvg-name="Huda TV" tvg-logo="https://i.imgur.com/1UUjU26.png" group-title="Egypt | Egypt TV",Huda TV
 https://cdn.bestream.io:19360/elfaro1/elfaro1.m3u8
+
+#EXTINF:-1 tvg-id="HyaTV.eg" tvg-name="Hya TV" tvg-logo="https://i.imgur.com/XjBIi0e.png" group-title="Egypt | Egypt TV",Hya TV
+https://freem3u.xyz/api/live/play.m3u8?vid=187
 
 #EXTINF:-1 tvg-id="Mazzika.eg" tvg-name="Mazzika" tvg-logo="https://i.imgur.com/P7PUHIx.png" group-title="Egypt | Egypt TV",Mazzika
 http://149.100.11.235:8080/Mazzika/index.m3u8

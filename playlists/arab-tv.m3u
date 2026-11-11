@@ -4,7 +4,7 @@
 # Categories: Quran, Kids, Family, Comedy, Theater, Series, Arabic Movies, Foreign Movies, Sports, Egypt TV
 # beIN SPORTS XTRA: validated candidate only
 # No codec-based filtering
-# Generated: 2026-11-10T22:35:14.715Z
+# Generated: 2026-11-11T03:13:31.782Z
 
 # === Bahrain | Sports ===
 #EXTINF:-1 tvg-id="BahrainSports1.bh" tvg-name="Bahrain Sports 1" tvg-logo="https://i.imgur.com/fBpLsbC.png" group-title="Bahrain | Sports",Bahrain Sports 1
@@ -85,9 +85,6 @@ https://kwtspta.cdn.mangomolo.com/sp/smil:sp.stream.smil/chunklist.m3u8
 https://kwtsplta.cdn.mangomolo.com/spl/smil:spl.stream.smil/chunklist.m3u8
 
 # === Qatar | Sports ===
-#EXTINF:-1 tvg-id="beINSports1.qa" tvg-name="beIN Sports 1" tvg-logo="https://i.imgur.com/Vtk2cGI.png" group-title="Qatar | Sports",beIN Sports 1
-http://86.192.195.47:9034/stream/1/index.m3u8
-
 #EXTINF:-1 tvg-id="beINSports2.qa" tvg-name="beIN Sports 2" tvg-logo="https://i.imgur.com/vUJZSvs.png" group-title="Qatar | Sports",beIN Sports 2
 http://86.192.195.47:9034/stream/2/index.m3u8
 

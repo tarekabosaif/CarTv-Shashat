@@ -1,9 +1,9 @@
 {
-  "generatedAt": "2026-11-12T14:03:40.268Z",
+  "generatedAt": "2026-11-12T22:56:30.016Z",
   "totalChannels": 48,
-  "online": 39,
-  "offline": 9,
-  "withAudio": 39,
+  "online": 38,
+  "offline": 10,
+  "withAudio": 38,
   "withoutAudio": 0,
   "channels": [
     {
@@ -37,7 +37,7 @@
       ],
       "hasVideo": true,
       "hasAudio": true,
-      "checkedAt": "2026-11-12T14:01:55.403Z"
+      "checkedAt": "2026-11-12T22:54:32.911Z"
     },
     {
       "id": "BahrainSports2.bh",
@@ -70,7 +70,7 @@
       ],
       "hasVideo": true,
       "hasAudio": true,
-      "checkedAt": "2026-11-12T14:01:55.537Z"
+      "checkedAt": "2026-11-12T22:54:33.090Z"
     },
     {
       "id": "NileDrama.eg",
@@ -96,7 +96,7 @@
       ],
       "hasVideo": true,
       "hasAudio": true,
-      "checkedAt": "2026-11-12T14:01:51.031Z"
+      "checkedAt": "2026-11-12T22:54:28.065Z"
     },
     {
       "id": "RotanaCinemaEgypt.eg",
@@ -109,7 +109,7 @@
       "hasVideo": false,
       "hasAudio": false,
       "error": "Command failed: ffprobe -v quiet -print_format json -show_streams -show_format -rw_timeout 15000000 https://rotana.hibridcdn.net/rotananet/cinemamasr_net-7Y83PP5adWixDF93/playlist.m3u8\n",
-      "checkedAt": "2026-11-12T14:01:49.954Z"
+      "checkedAt": "2026-11-12T22:54:27.071Z"
     },
     {
       "id": "MixHollywood.eg",
@@ -156,7 +156,7 @@
       ],
       "hasVideo": true,
       "hasAudio": true,
-      "checkedAt": "2026-11-12T14:02:04.457Z"
+      "checkedAt": "2026-11-12T22:54:40.593Z"
     },
     {
       "id": "AlGhadTV.eg",
@@ -203,7 +203,7 @@
       ],
       "hasVideo": true,
       "hasAudio": true,
-      "checkedAt": "2026-11-12T14:02:12.944Z"
+      "checkedAt": "2026-11-12T22:54:50.466Z"
     },
     {
       "id": "AlMasriyah.eg",
@@ -229,7 +229,7 @@
       ],
       "hasVideo": true,
       "hasAudio": true,
-      "checkedAt": "2026-11-12T14:02:05.969Z"
+      "checkedAt": "2026-11-12T22:54:42.096Z"
     },
     {
       "id": "AlQaheraNews.eg",
@@ -242,7 +242,7 @@
       "hasVideo": false,
       "hasAudio": false,
       "error": "Command failed: ffprobe -v quiet -print_format json -show_streams -show_format -rw_timeout 15000000 https://bcovlive-a.akamaihd.net/d30cbb3350af4cb7a6e05b9eb1bfd850/eu-west-1/6057955906001/playlist.m3u8\n",
-      "checkedAt": "2026-11-12T14:02:04.547Z"
+      "checkedAt": "2026-11-12T22:54:40.718Z"
     },
     {
       "id": "AlhayatTV.eg",
@@ -296,7 +296,7 @@
       ],
       "hasVideo": true,
       "hasAudio": true,
-      "checkedAt": "2026-11-12T14:02:14.397Z"
+      "checkedAt": "2026-11-12T22:54:50.865Z"
     },
     {
       "id": "ElRadio9090FM.eg",
@@ -322,7 +322,7 @@
       ],
       "hasVideo": true,
       "hasAudio": true,
-      "checkedAt": "2026-11-12T14:02:06.847Z"
+      "checkedAt": "2026-11-12T22:54:43.042Z"
     },
     {
       "id": "HudaTV.eg",
@@ -348,7 +348,7 @@
       ],
       "hasVideo": true,
       "hasAudio": true,
-      "checkedAt": "2026-11-12T14:02:16.718Z"
+      "checkedAt": "2026-11-12T22:54:53.632Z"
     },
     {
       "id": "HyaTV.eg",
@@ -361,7 +361,7 @@
       "hasVideo": false,
       "hasAudio": false,
       "error": "Command failed: ffprobe -v quiet -print_format json -show_streams -show_format -rw_timeout 15000000 https://freem3u.xyz/api/live/play.m3u8?vid=187\n",
-      "checkedAt": "2026-11-12T14:02:34.410Z"
+      "checkedAt": "2026-11-12T22:55:10.875Z"
     },
     {
       "id": "Mazzika.eg",
@@ -387,7 +387,7 @@
       ],
       "hasVideo": true,
       "hasAudio": true,
-      "checkedAt": "2026-11-12T14:02:15.660Z"
+      "checkedAt": "2026-11-12T22:54:52.167Z"
     },
     {
       "id": "MBC1Egypt.eg",
@@ -413,7 +413,7 @@
       ],
       "hasVideo": true,
       "hasAudio": true,
-      "checkedAt": "2026-11-12T14:02:23.679Z"
+      "checkedAt": "2026-11-12T22:55:00.018Z"
     },
     {
       "id": "MBCMasr.eg",
@@ -439,7 +439,7 @@
       ],
       "hasVideo": true,
       "hasAudio": true,
-      "checkedAt": "2026-11-12T14:02:22.937Z"
+      "checkedAt": "2026-11-12T22:54:57.960Z"
     },
     {
       "id": "MBCMasr2.eg",
@@ -465,7 +465,7 @@
       ],
       "hasVideo": true,
       "hasAudio": true,
-      "checkedAt": "2026-11-12T14:02:42.899Z"
+      "checkedAt": "2026-11-12T22:55:17.828Z"
     },
     {
       "id": "NogoumFMTV.eg",
@@ -478,7 +478,7 @@
       "hasVideo": false,
       "hasAudio": false,
       "error": "Command failed: ffprobe -v quiet -print_format json -show_streams -show_format -rw_timeout 15000000 https://nogoumtv.nrpstream.com/hls/stream.m3u8\n",
-      "checkedAt": "2026-11-12T14:02:34.552Z"
+      "checkedAt": "2026-11-12T22:55:11.053Z"
     },
     {
       "id": "WatanTV.eg",
@@ -504,7 +504,7 @@
       ],
       "hasVideo": true,
       "hasAudio": true,
-      "checkedAt": "2026-11-12T14:02:36.904Z"
+      "checkedAt": "2026-11-12T22:55:13.317Z"
     },
     {
       "id": "beINSportsXTRA.int",
@@ -565,7 +565,7 @@
       ],
       "hasVideo": true,
       "hasAudio": true,
-      "checkedAt": "2026-11-12T14:02:35.751Z"
+      "checkedAt": "2026-11-12T22:55:12.669Z"
     },
     {
       "id": "JordanComedy.jo",
@@ -585,88 +585,47 @@
           "codec": "aac",
           "profile": "LC",
           "channels": 2,
-          "sampleRate": "48000",
+          "sampleRate": "44100",
           "language": null
         },
         {
           "codec": "aac",
           "profile": "LC",
           "channels": 2,
-          "sampleRate": "48000",
+          "sampleRate": "44100",
           "language": null
         },
         {
           "codec": "aac",
           "profile": "LC",
           "channels": 2,
-          "sampleRate": "48000",
+          "sampleRate": "44100",
           "language": null
         },
         {
           "codec": "aac",
           "profile": "LC",
           "channels": 2,
-          "sampleRate": "48000",
-          "language": null
-        },
-        {
-          "codec": "aac",
-          "profile": "LC",
-          "channels": 2,
-          "sampleRate": "48000",
+          "sampleRate": "44100",
           "language": null
         }
       ],
       "hasVideo": true,
       "hasAudio": true,
-      "checkedAt": "2026-11-12T14:02:44.155Z"
+      "checkedAt": "2026-11-12T22:55:20.032Z"
     },
     {
       "id": "JordanSport.jo",
       "name": "Jordan Sport",
       "group": "Jordan | Sports",
       "url": "https://jrtv-live.ercdn.net/jordansporthd/jordansporthd.m3u8",
-      "online": true,
-      "video": {
-        "codec": "h264",
-        "profile": "High",
-        "width": 1920,
-        "height": 1080,
-        "fps": "25/1"
-      },
-      "audio": [
-        {
-          "codec": "aac",
-          "profile": "LC",
-          "channels": 2,
-          "sampleRate": "48000",
-          "language": null
-        },
-        {
-          "codec": "aac",
-          "profile": "LC",
-          "channels": 2,
-          "sampleRate": "48000",
-          "language": null
-        },
-        {
-          "codec": "aac",
-          "profile": "LC",
-          "channels": 2,
-          "sampleRate": "48000",
-          "language": null
-        },
-        {
-          "codec": "aac",
-          "profile": "LC",
-          "channels": 2,
-          "sampleRate": "48000",
-          "language": null
-        }
-      ],
-      "hasVideo": true,
-      "hasAudio": true,
-      "checkedAt": "2026-11-12T14:02:53.330Z"
+      "online": false,
+      "video": null,
+      "audio": [],
+      "hasVideo": false,
+      "hasAudio": false,
+      "error": "Command failed: ffprobe -v quiet -print_format json -show_streams -show_format -rw_timeout 15000000 https://jrtv-live.ercdn.net/jordansporthd/jordansporthd.m3u8\n",
+      "checkedAt": "2026-11-12T22:55:40.039Z"
     },
     {
       "id": "KTVSport.kw",
@@ -713,7 +672,7 @@
       ],
       "hasVideo": true,
       "hasAudio": true,
-      "checkedAt": "2026-11-12T14:02:50.860Z"
+      "checkedAt": "2026-11-12T22:55:28.476Z"
     },
     {
       "id": "KTVSportPlus.kw",
@@ -760,7 +719,7 @@
       ],
       "hasVideo": true,
       "hasAudio": true,
-      "checkedAt": "2026-11-12T14:02:50.660Z"
+      "checkedAt": "2026-11-12T22:55:30.717Z"
     },
     {
       "id": "AlQuranAlKareemTV.sa",
@@ -786,7 +745,7 @@
       ],
       "hasVideo": true,
       "hasAudio": true,
-      "checkedAt": "2026-11-12T14:02:45.015Z"
+      "checkedAt": "2026-11-12T22:55:21.236Z"
     },
     {
       "id": "HolyQuranRadio.sa",
@@ -812,7 +771,7 @@
       ],
       "hasVideo": true,
       "hasAudio": true,
-      "checkedAt": "2026-11-12T14:02:46.054Z"
+      "checkedAt": "2026-11-12T22:55:20.970Z"
     },
     {
       "id": "IqraaQuran.sa",
@@ -822,17 +781,24 @@
       "online": true,
       "video": {
         "codec": "h264",
-        "profile": "High",
-        "width": 1920,
-        "height": 1080,
-        "fps": "25/1"
+        "profile": null,
+        "width": null,
+        "height": null,
+        "fps": "0/0"
       },
       "audio": [
         {
           "codec": "aac",
-          "profile": "LC",
-          "channels": 2,
-          "sampleRate": "48000",
+          "profile": null,
+          "channels": null,
+          "sampleRate": "0",
+          "language": null
+        },
+        {
+          "codec": "aac",
+          "profile": null,
+          "channels": null,
+          "sampleRate": "0",
           "language": null
         },
         {
@@ -844,29 +810,22 @@
         },
         {
           "codec": "aac",
-          "profile": "LC",
-          "channels": 2,
-          "sampleRate": "48000",
+          "profile": null,
+          "channels": null,
+          "sampleRate": "0",
           "language": null
         },
         {
           "codec": "aac",
-          "profile": "LC",
-          "channels": 2,
-          "sampleRate": "48000",
-          "language": null
-        },
-        {
-          "codec": "aac",
-          "profile": "LC",
-          "channels": 2,
-          "sampleRate": "48000",
+          "profile": null,
+          "channels": null,
+          "sampleRate": "0",
           "language": null
         }
       ],
       "hasVideo": true,
       "hasAudio": true,
-      "checkedAt": "2026-11-12T14:03:03.877Z"
+      "checkedAt": "2026-11-12T22:55:52.812Z"
     },
     {
       "id": "AtfalMawahebTV.sa",
@@ -892,7 +851,7 @@
       ],
       "hasVideo": true,
       "hasAudio": true,
-      "checkedAt": "2026-11-12T14:02:56.342Z"
+      "checkedAt": "2026-11-12T22:55:43.097Z"
     },
     {
       "id": "RotanaComedy.sa",
@@ -905,7 +864,7 @@
       "hasVideo": false,
       "hasAudio": false,
       "error": "Command failed: ffprobe -v quiet -print_format json -show_streams -show_format -rw_timeout 15000000 https://rotana.hibridcdn.net/rotananet/comedy_net-7Y83PP5adWixDF93/playlist.m3u8\n",
-      "checkedAt": "2026-11-12T14:02:53.652Z"
+      "checkedAt": "2026-11-12T22:55:40.341Z"
     },
     {
       "id": "BabAlHara.sa",
@@ -980,7 +939,7 @@
       ],
       "hasVideo": true,
       "hasAudio": true,
-      "checkedAt": "2026-11-12T14:03:00.663Z"
+      "checkedAt": "2026-11-12T22:55:46.627Z"
     },
     {
       "id": "Maraya.sa",
@@ -1055,7 +1014,7 @@
       ],
       "hasVideo": true,
       "hasAudio": true,
-      "checkedAt": "2026-11-12T14:03:00.765Z"
+      "checkedAt": "2026-11-12T22:55:46.968Z"
     },
     {
       "id": "MBCMasrDrama.sa",
@@ -1081,7 +1040,7 @@
       ],
       "hasVideo": true,
       "hasAudio": true,
-      "checkedAt": "2026-11-12T14:03:12.197Z"
+      "checkedAt": "2026-11-12T22:55:58.850Z"
     },
     {
       "id": "MBCPlusDrama.sa",
@@ -1107,7 +1066,7 @@
       ],
       "hasVideo": true,
       "hasAudio": true,
-      "checkedAt": "2026-11-12T14:03:10.781Z"
+      "checkedAt": "2026-11-12T22:55:59.570Z"
     },
     {
       "id": "RotanaDrama.sa",
@@ -1120,7 +1079,7 @@
       "hasVideo": false,
       "hasAudio": false,
       "error": "Command failed: ffprobe -v quiet -print_format json -show_streams -show_format -rw_timeout 15000000 https://rotana.hibridcdn.net/rotananet/drama_net-7Y83PP5adWixDF93/playlist.m3u8\n",
-      "checkedAt": "2026-11-12T14:03:04.084Z"
+      "checkedAt": "2026-11-12T22:55:53.158Z"
     },
     {
       "id": "Aflam.sa",
@@ -1195,7 +1154,7 @@
       ],
       "hasVideo": true,
       "hasAudio": true,
-      "checkedAt": "2026-11-12T14:03:10.544Z"
+      "checkedAt": "2026-11-12T22:55:58.857Z"
     },
     {
       "id": "IqraaArabic.sa",
@@ -1220,29 +1179,29 @@
         },
         {
           "codec": "aac",
-          "profile": "LC",
-          "channels": 2,
-          "sampleRate": "48000",
+          "profile": null,
+          "channels": null,
+          "sampleRate": "0",
           "language": null
         },
         {
           "codec": "aac",
-          "profile": "LC",
-          "channels": 2,
-          "sampleRate": "48000",
+          "profile": null,
+          "channels": null,
+          "sampleRate": "0",
           "language": null
         },
         {
           "codec": "aac",
-          "profile": "LC",
-          "channels": 2,
-          "sampleRate": "48000",
+          "profile": null,
+          "channels": null,
+          "sampleRate": "0",
           "language": null
         }
       ],
       "hasVideo": true,
       "hasAudio": true,
-      "checkedAt": "2026-11-12T14:03:11.819Z"
+      "checkedAt": "2026-11-12T22:56:03.439Z"
     },
     {
       "id": "RotanaCinemaKSA.sa",
@@ -1255,7 +1214,7 @@
       "hasVideo": false,
       "hasAudio": false,
       "error": "Command failed: ffprobe -v quiet -print_format json -show_streams -show_format -rw_timeout 15000000 https://rotana.hibridcdn.net/rotananet/cinema_net-7Y83PP5adWixDF93/playlist.m3u8\n",
-      "checkedAt": "2026-11-12T14:03:12.455Z"
+      "checkedAt": "2026-11-12T22:56:03.676Z"
     },
     {
       "id": "MoviesAction.sa",
@@ -1330,7 +1289,7 @@
       ],
       "hasVideo": true,
       "hasAudio": true,
-      "checkedAt": "2026-11-12T14:03:18.952Z"
+      "checkedAt": "2026-11-12T22:56:09.686Z"
     },
     {
       "id": "MoviesThriller.sa",
@@ -1405,7 +1364,7 @@
       ],
       "hasVideo": true,
       "hasAudio": true,
-      "checkedAt": "2026-11-12T14:03:19.201Z"
+      "checkedAt": "2026-11-12T22:56:10.219Z"
     },
     {
       "id": "AlSouriyaTV.sy",
@@ -1431,7 +1390,7 @@
       ],
       "hasVideo": true,
       "hasAudio": true,
-      "checkedAt": "2026-11-12T14:03:20.985Z"
+      "checkedAt": "2026-11-12T22:56:09.659Z"
     },
     {
       "id": "Prime.sy",
@@ -1457,7 +1416,7 @@
       ],
       "hasVideo": true,
       "hasAudio": true,
-      "checkedAt": "2026-11-12T14:03:14.806Z"
+      "checkedAt": "2026-11-12T22:56:06.146Z"
     },
     {
       "id": "CartoonNetworkArabic.ae",
@@ -1483,7 +1442,7 @@
       ],
       "hasVideo": true,
       "hasAudio": true,
-      "checkedAt": "2026-11-12T14:03:22.462Z"
+      "checkedAt": "2026-11-12T22:56:11.773Z"
     },
     {
       "id": "SpacetoonArabic.ae",
@@ -1509,7 +1468,7 @@
       ],
       "hasVideo": true,
       "hasAudio": true,
-      "checkedAt": "2026-11-12T14:03:30.586Z"
+      "checkedAt": "2026-11-12T22:56:20.451Z"
     },
     {
       "id": "MBC5.ae",
@@ -1535,7 +1494,7 @@
       ],
       "hasVideo": true,
       "hasAudio": true,
-      "checkedAt": "2026-11-12T14:03:25.856Z"
+      "checkedAt": "2026-11-12T22:56:14.693Z"
     },
     {
       "id": "MBCDrama.ae",
@@ -1561,7 +1520,7 @@
       ],
       "hasVideo": true,
       "hasAudio": true,
-      "checkedAt": "2026-11-12T14:03:28.686Z"
+      "checkedAt": "2026-11-12T22:56:16.671Z"
     },
     {
       "id": "MBCBollywood.ae",
@@ -1587,7 +1546,7 @@
       ],
       "hasVideo": true,
       "hasAudio": true,
-      "checkedAt": "2026-11-12T14:03:26.650Z"
+      "checkedAt": "2026-11-12T22:56:16.025Z"
     },
     {
       "id": "OSNMoviesAction.ae",
@@ -1600,7 +1559,7 @@
       "hasVideo": false,
       "hasAudio": false,
       "error": "Command failed: ffprobe -v quiet -print_format json -show_streams -show_format -rw_timeout 15000000 http://116.90.120.151:8000/play/a0ax/index.m3u8\n",
-      "checkedAt": "2026-11-12T14:03:30.907Z"
+      "checkedAt": "2026-11-12T22:56:20.790Z"
     },
     {
       "id": "PeaceTVEnglish.ae",
@@ -1647,7 +1606,7 @@
       ],
       "hasVideo": true,
       "hasAudio": true,
-      "checkedAt": "2026-11-12T14:03:40.268Z"
+      "checkedAt": "2026-11-12T22:56:30.016Z"
     },
     {
       "id": "SharjahSports.ae",
@@ -1660,7 +1619,7 @@
       "hasVideo": false,
       "hasAudio": false,
       "error": "Command failed: ffprobe -v quiet -print_format json -show_streams -show_format -rw_timeout 15000000 https://svs.itworkscdn.net/smc4sportslive/smc4tv.smil/playlist.m3u8\n",
-      "checkedAt": "2026-11-12T14:03:30.725Z"
+      "checkedAt": "2026-11-12T22:56:20.685Z"
     }
   ]
 }

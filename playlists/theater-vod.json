@@ -1,7 +1,7 @@
 {
   "version": 1,
   "type": "theater-vod",
-  "generatedAt": "2026-11-11T23:44:38.551Z",
+  "generatedAt": "2026-11-12T04:24:46.722Z",
   "playbackPolicy": {
     "description": "Use provider-supported playback only.",
     "directStreamExtraction": false,
